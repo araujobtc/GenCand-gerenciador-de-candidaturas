@@ -1,0 +1,10 @@
+# Perfil de producao: ative com SPRING_PROFILES_ACTIVE=production
+springdoc:
+  api-docs:
+    enabled: false
+  swagger-ui:
+    enabled: false
+logging:
+  level:
+    root: INFO
+    com.gencand: INFO
