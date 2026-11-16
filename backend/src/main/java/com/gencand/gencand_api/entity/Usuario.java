@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.Generated;
+import org.hibernate.annotations.UuidGenerator;
 import org.hibernate.generator.EventType;
 
 import java.util.UUID;
@@ -17,8 +17,8 @@ import java.util.UUID;
 public class Usuario {
 
     @Id
-    @Generated(event = EventType.INSERT)
-    @Column(name = "id", updatable = false, nullable = false)
+    @UuidGenerator(style = UuidGenerator.Style.VERSION_7)
+    @Column(name = "id", nullable = false, updatable = false)
     private UUID id;
 
     @Column(name = "email", nullable = false)

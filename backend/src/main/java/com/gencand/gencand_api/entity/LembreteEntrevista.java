@@ -5,7 +5,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.annotations.Generated;
+import org.hibernate.annotations.UuidGenerator;
 import org.hibernate.generator.EventType;
 
 import java.util.UUID;
@@ -24,7 +24,7 @@ import java.util.UUID;
 public class LembreteEntrevista {
 
     @Id
-    @Generated(event = EventType.INSERT)
+    @UuidGenerator(style = UuidGenerator.Style.VERSION_7)
     @Column(name = "id", nullable = false, updatable = false)
     private UUID id;
 
@@ -35,6 +35,6 @@ public class LembreteEntrevista {
     @Column(name = "minutos_antes", nullable = false)
     private Integer minutosAntes;
 
-    @Column(name = "enviado", nullable = false, insertable = false)
-    private Boolean enviado;
+    @Column(name = "enviado", nullable = false)
+    private Boolean enviado = false;
 }

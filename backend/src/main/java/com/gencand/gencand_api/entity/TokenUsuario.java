@@ -5,7 +5,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.annotations.Generated;
+import org.hibernate.annotations.UuidGenerator;
 import org.hibernate.generator.EventType;
 
 import java.time.Instant;
@@ -25,7 +25,7 @@ import java.util.UUID;
 public class TokenUsuario {
 
     @Id
-    @Generated(event = EventType.INSERT)
+    @UuidGenerator(style = UuidGenerator.Style.VERSION_7)
     @Column(name = "id", nullable = false, updatable = false)
     private UUID id;
 
@@ -42,6 +42,6 @@ public class TokenUsuario {
     @Column(name = "expira_em", nullable = false)
     private Instant expiraEm;
 
-    @Column(name = "usado", nullable = false, insertable = false)
-    private Boolean usado;
+    @Column(name = "usado", nullable = false)
+    private Boolean usado = false;
 }

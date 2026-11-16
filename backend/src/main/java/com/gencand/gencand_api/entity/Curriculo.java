@@ -6,7 +6,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.annotations.Generated;
+import org.hibernate.annotations.UuidGenerator;
 import org.hibernate.generator.EventType;
 
 import java.util.UUID;
@@ -19,7 +19,7 @@ import java.util.UUID;
 public class Curriculo {
 
     @Id
-    @Generated(event = EventType.INSERT)
+    @UuidGenerator(style = UuidGenerator.Style.VERSION_7)
     @Column(name = "id", nullable = false, updatable = false)
     private UUID id;
 
@@ -30,8 +30,8 @@ public class Curriculo {
     @Column(name = "nome", nullable = false)
     private String nome;
 
-    @Column(name = "principal", nullable = false, insertable = false)
-    private Boolean principal;
+    @Column(name = "principal", nullable = false)
+    private Boolean principal = false;
 
     @Column(name = "arquivo", nullable = false, columnDefinition = "bytea")
     private byte[] arquivo;

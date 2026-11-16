@@ -4,13 +4,13 @@ import com.gencand.gencand_api.plataforma.entity.Plataforma;
 import com.gencand.gencand_api.usuario.entity.Usuario;
 import jakarta.persistence.*;
 import lombok.Getter;
-import lombok.Setter;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.Generated;
-import org.hibernate.generator.EventType;
+import lombok.Setter;
+import org.hibernate.annotations.UuidGenerator;
 
-import java.time.LocalDate;
 import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.UUID;
 
 @Getter
@@ -21,8 +21,8 @@ import java.util.UUID;
 public class Candidatura {
 
     @Id
-    @Generated(event = EventType.INSERT)
-    @Column(name = "id", updatable = false, nullable = false)
+    @UuidGenerator(style = UuidGenerator.Style.VERSION_7)
+    @Column(name = "id", nullable = false, updatable = false)
     private UUID id;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
@@ -43,10 +43,10 @@ public class Candidatura {
     private String link;
 
     @Column(name = "data_candidatura", nullable = false)
-    private LocalDate dataCandidatura;
+    private LocalDate dataCandidatura = LocalDate.now(ZoneId.of("America/Sao_Paulo"));
 
     @Column(name = "data_atualizacao", nullable = false)
-    private LocalDate dataAtualizacao;
+    private Instant dataAtualizacao = Instant.now();
 
     @Column(name = "status")
     private String status;
@@ -59,5 +59,4 @@ public class Candidatura {
 
     @Column(name = "oculta", nullable = false)
     private Boolean oculta = false;
-    
 }

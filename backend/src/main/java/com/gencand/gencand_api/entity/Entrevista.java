@@ -5,7 +5,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.annotations.Generated;
+import org.hibernate.annotations.UuidGenerator;
 import org.hibernate.generator.EventType;
 
 import java.time.Instant;
@@ -19,7 +19,7 @@ import java.util.UUID;
 public class Entrevista {
 
     @Id
-    @Generated(event = EventType.INSERT)
+    @UuidGenerator(style = UuidGenerator.Style.VERSION_7)
     @Column(name = "id", nullable = false, updatable = false)
     private UUID id;
 

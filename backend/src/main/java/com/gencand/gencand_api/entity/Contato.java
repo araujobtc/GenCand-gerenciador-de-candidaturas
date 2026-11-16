@@ -6,7 +6,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.annotations.Generated;
+import org.hibernate.annotations.UuidGenerator;
 import org.hibernate.generator.EventType;
 
 import java.util.UUID;
@@ -19,7 +19,7 @@ import java.util.UUID;
 public class Contato {
 
     @Id
-    @Generated(event = EventType.INSERT)
+    @UuidGenerator(style = UuidGenerator.Style.VERSION_7)
     @Column(name = "id", nullable = false, updatable = false)
     private UUID id;
 
@@ -36,7 +36,7 @@ public class Contato {
     @Column(name = "email")
     private String email;
 
-    @Column(name = "telefone", length = 11)
+    @Column(name = "telefone")
     private String telefone;
 
     @Column(name = "linkedin")
