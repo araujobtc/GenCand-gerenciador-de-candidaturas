@@ -1,4 +1,4 @@
-package com.gencand.gencand_api.candidatura.entity;
+package com.gencand.gencand_api.entity;
 
 import com.gencand.gencand_api.plataforma.entity.Plataforma;
 import com.gencand.gencand_api.usuario.entity.Usuario;

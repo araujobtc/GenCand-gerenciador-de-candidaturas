@@ -49,6 +49,6 @@ app:
     expiracao-minutos: 60
   brevo:
     url: https://api.brevo.com/v3/smtp/email
-    api-key: ${BREVO_API_KEY}
-    remetente-email: ${BREVO_REMETENTE_EMAIL}
-    remetente-nome: ${BREVO_REMETENTE_NOME}
+    api-key: ${BREVO_API_KEY:}
+    remetente-email: ${BREVO_REMETENTE_EMAIL:}
+    remetente-nome: ${BREVO_REMETENTE_NOME:GenCand}

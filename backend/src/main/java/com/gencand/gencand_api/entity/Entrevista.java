@@ -1,5 +1,4 @@
-
-package com.gencand.gencand_api.candidatura.entity;
+package com.gencand.gencand_api.entity;
 
 import jakarta.persistence.*;
 import lombok.Getter;
