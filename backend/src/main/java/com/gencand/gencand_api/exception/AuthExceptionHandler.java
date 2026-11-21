@@ -1,0 +1,21 @@
+package com.gencand.gencand_api.exception;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ProblemDetail;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
+
+@RestControllerAdvice
+public class AuthExceptionHandler {
+
+    @ExceptionHandler(BadCredentialsException.class)
+    public ProblemDetail tratarCredenciaisInvalidas(
+            BadCredentialsException exception) {
+
+        return ProblemDetail.forStatusAndDetail(
+                HttpStatus.UNAUTHORIZED,
+                "E-mail ou senha inválidos"
+        );
+    }
+}
