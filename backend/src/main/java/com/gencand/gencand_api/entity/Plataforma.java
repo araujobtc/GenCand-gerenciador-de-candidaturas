@@ -1,12 +1,10 @@
 package com.gencand.gencand_api.entity;
 
-import com.gencand.gencand_api.usuario.entity.Usuario;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.UuidGenerator;
-import org.hibernate.generator.EventType;
 
 import java.util.UUID;
 
@@ -37,5 +35,4 @@ public class Plataforma {
 
     @Column(name = "oculta", nullable = false)
     private Boolean oculta = false;
-    
 }

@@ -1,7 +1,5 @@
 package com.gencand.gencand_api.entity;
 
-import com.gencand.gencand_api.plataforma.entity.Plataforma;
-import com.gencand.gencand_api.usuario.entity.Usuario;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

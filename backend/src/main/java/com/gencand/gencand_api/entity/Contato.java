@@ -1,12 +1,10 @@
 package com.gencand.gencand_api.entity;
 
-import com.gencand.gencand_api.usuario.entity.Usuario;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.UuidGenerator;
-import org.hibernate.generator.EventType;
 
 import java.util.UUID;
 
