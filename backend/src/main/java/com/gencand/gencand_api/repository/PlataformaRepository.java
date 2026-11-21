@@ -11,6 +11,8 @@ public interface PlataformaRepository extends JpaRepository<Plataforma, UUID> {
 
     List<Plataforma> findByUsuarioIdOrderByNomeAsc(UUID usuarioId);
 
+    List<Plataforma> findByUsuarioIdAndOcultaFalseOrderByNomeAsc(UUID usuarioId);
+
     // Busca sempre junto do dono: um id de outra usuaria nao retorna nada.
     Optional<Plataforma> findByIdAndUsuarioId(UUID id, UUID usuarioId);
 
