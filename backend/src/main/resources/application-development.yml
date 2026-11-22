@@ -1,4 +1,4 @@
-# Perfil de homologacao: ative com SPRING_PROFILES_ACTIVE=development
+# Perfil de desenvolvimento local: ative com SPRING_PROFILES_ACTIVE=development
 springdoc:
   api-docs:
     enabled: true

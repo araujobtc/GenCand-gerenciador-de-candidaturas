@@ -81,6 +81,23 @@ public class CandidaturaService {
     }
 
     @Transactional
+    public CandidaturaResponse atualizarStatus(
+            UUID candidaturaId, String statusNovo, UUID usuarioId) {
+        Candidatura candidatura = buscarEntidade(candidaturaId, usuarioId);
+        String statusAnterior = candidatura.getStatus();
+
+        if (!Objects.equals(statusAnterior, statusNovo)) {
+            candidatura.setStatus(statusNovo);
+            candidatura.setDataAtualizacao(Instant.now());
+            Candidatura salva = candidaturaRepository.save(candidatura);
+            registrarHistoricoSeNecessario(salva, statusAnterior, statusNovo);
+            return paraResponse(salva);
+        }
+
+        return paraResponse(candidatura);
+    }
+
+    @Transactional
     public CandidaturaResponse verificarHoje(UUID candidaturaId, UUID usuarioId) {
         Candidatura candidatura = buscarEntidade(candidaturaId, usuarioId);
         candidatura.setDataAtualizacao(Instant.now());
@@ -102,7 +119,6 @@ public class CandidaturaService {
 
     private void registrarHistoricoSeNecessario(
             Candidatura candidatura, String statusAnterior, String statusNovo) {
-        // A tabela exige status_novo preenchido; a criação sem status não gera histórico.
         if (statusNovo == null) {
             return;
         }
