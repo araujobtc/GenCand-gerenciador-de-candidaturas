@@ -51,8 +51,14 @@ app:
     # Informe as origens separadas por vírgula, sem barra no final.
     allowed-origins: ${FRONTEND_URL:http://localhost:5173}
   frontend-url: ${FRONTEND_URL:http://localhost:5173}
+  auth:
+    confirmacao:
+      max-reenvios-por-hora: 3
   brevo:
     url: https://api.brevo.com/v3/smtp/email
     api-key: ${BREVO_API_KEY:}
     remetente-email: ${BREVO_REMETENTE_EMAIL:}
     remetente-nome: ${BREVO_REMETENTE_NOME:GenCand}
+    timeout:
+      connect: 5s
+      read: 10s

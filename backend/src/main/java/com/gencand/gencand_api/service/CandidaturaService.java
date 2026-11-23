@@ -1,5 +1,6 @@
 package com.gencand.gencand_api.service;
 
+import com.gencand.gencand_api.dto.request.CandidaturaAtualizacaoRequest;
 import com.gencand.gencand_api.dto.request.CandidaturaRequest;
 import com.gencand.gencand_api.dto.response.CandidaturaResponse;
 import com.gencand.gencand_api.entity.Candidatura;
@@ -54,7 +55,10 @@ public class CandidaturaService {
         candidatura.setDataCandidatura(request.dataCandidatura() != null
                 ? request.dataCandidatura() : LocalDate.now(FUSO_BRASILIA));
         candidatura.setDataAtualizacao(Instant.now());
-        aplicarDados(candidatura, request, usuarioId);
+        aplicarDadosComuns(candidatura, request.titulo(), request.empresa(),
+                request.link(), request.plataformaId(), request.dataCandidatura(),
+                request.observacao(), usuarioId);
+        candidatura.setStatus(request.status());
 
         Candidatura salva = candidaturaRepository.save(candidatura);
         registrarHistoricoSeNecessario(salva, null, salva.getStatus());
@@ -62,22 +66,16 @@ public class CandidaturaService {
     }
 
     @Transactional
-    public CandidaturaResponse atualizar(UUID candidaturaId, CandidaturaRequest request, UUID usuarioId) {
+    public CandidaturaResponse atualizar(
+            UUID candidaturaId, CandidaturaAtualizacaoRequest request, UUID usuarioId) {
         Candidatura candidatura = buscarEntidade(candidaturaId, usuarioId);
-        String statusAnterior = candidatura.getStatus();
-        String statusNovo = request.status();
-        boolean statusAlterado = !Objects.equals(statusAnterior, statusNovo);
 
-        aplicarDados(candidatura, request, usuarioId);
-        if (statusAlterado) {
-            candidatura.setDataAtualizacao(Instant.now());
-        }
+        // O status não faz parte do DTO de PUT e, portanto, permanece inalterado.
+        aplicarDadosComuns(candidatura, request.titulo(), request.empresa(),
+                request.link(), request.plataformaId(), request.dataCandidatura(),
+                request.observacao(), usuarioId);
 
-        Candidatura salva = candidaturaRepository.save(candidatura);
-        if (statusAlterado) {
-            registrarHistoricoSeNecessario(salva, statusAnterior, statusNovo);
-        }
-        return paraResponse(salva);
+        return paraResponse(candidaturaRepository.save(candidatura));
     }
 
     @Transactional
@@ -136,22 +134,30 @@ public class CandidaturaService {
                         HttpStatus.NOT_FOUND, "Candidatura não encontrada"));
     }
 
-    private void aplicarDados(Candidatura candidatura, CandidaturaRequest request, UUID usuarioId) {
-        candidatura.setTitulo(request.titulo().trim());
-        candidatura.setEmpresa(request.empresa().trim());
-        candidatura.setLink(limpar(request.link()));
-        candidatura.setObservacao(limpar(request.observacao()));
-        candidatura.setStatus(request.status());
+    private void aplicarDadosComuns(
+            Candidatura candidatura,
+            String titulo,
+            String empresa,
+            String link,
+            UUID plataformaId,
+            LocalDate dataCandidatura,
+            String observacao,
+            UUID usuarioId) {
 
-        if (request.dataCandidatura() != null) {
-            candidatura.setDataCandidatura(request.dataCandidatura());
+        candidatura.setTitulo(titulo.trim());
+        candidatura.setEmpresa(empresa.trim());
+        candidatura.setLink(limpar(link));
+        candidatura.setObservacao(limpar(observacao));
+
+        if (dataCandidatura != null) {
+            candidatura.setDataCandidatura(dataCandidatura);
         }
 
-        if (request.plataformaId() == null) {
+        if (plataformaId == null) {
             candidatura.setPlataforma(null);
         } else {
             Plataforma plataforma = plataformaRepository
-                    .findByIdAndUsuarioId(request.plataformaId(), usuarioId)
+                    .findByIdAndUsuarioId(plataformaId, usuarioId)
                     .orElseThrow(() -> new ResponseStatusException(
                             HttpStatus.NOT_FOUND, "Plataforma não encontrada"));
             candidatura.setPlataforma(plataforma);

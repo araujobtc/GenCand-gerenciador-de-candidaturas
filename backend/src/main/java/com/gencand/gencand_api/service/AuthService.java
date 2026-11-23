@@ -7,6 +7,7 @@ import com.gencand.gencand_api.repository.TokenUsuarioRepository;
 import com.gencand.gencand_api.repository.UsuarioRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -22,6 +23,7 @@ import org.springframework.web.server.ResponseStatusException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
+import java.time.Duration;
 import java.time.Instant;
 import java.util.Base64;
 import java.util.HexFormat;
@@ -40,16 +42,19 @@ public class AuthService {
     private final TokenUsuarioRepository tokenUsuarioRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtEncoder jwtEncoder;
-    private final BrevoEmailService brevoEmailService;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Value("${app.jwt.expiracao-minutos:60}")
     private long expiracaoMinutos;
 
+    @Value("${app.auth.confirmacao.max-reenvios-por-hora:3}")
+    private long maxReenviosPorHora = 3;
+
     @Transactional
     public void registrar(String email, String senha) {
-        String emailNormalizado = email.trim().toLowerCase(Locale.ROOT);
+        String emailNormalizado = normalizarEmail(email);
 
-        // Resposta externa é sempre a mesma para não revelar se o e-mail já possui conta.
+        // Mantém uma resposta externa genérica para não revelar contas existentes.
         if (usuarioRepository.existsByEmailIgnoreCase(emailNormalizado)) {
             return;
         }
@@ -60,17 +65,23 @@ public class AuthService {
         usuario.setEmailConfirmado(false);
         Usuario salvo = usuarioRepository.save(usuario);
 
-        String tokenEmTexto = gerarToken();
-        invalidarTokensAnteriores(salvo);
-        TokenUsuario token = new TokenUsuario();
-        token.setUsuario(salvo);
-        token.setTipo(TIPO_CONFIRMACAO_EMAIL);
-        token.setTokenHash(hashToken(tokenEmTexto));
-        token.setExpiraEm(Instant.now().plusSeconds(24 * 60 * 60));
-        token.setUsado(false);
-        tokenUsuarioRepository.save(token);
+        criarTokenEAgendarEmail(salvo);
+    }
 
-        brevoEmailService.enviarConfirmacaoEmail(salvo.getEmail(), tokenEmTexto);
+    @Transactional
+    public void reenviarConfirmacao(String email) {
+        usuarioRepository.findByEmailIgnoreCase(normalizarEmail(email))
+                .filter(usuario -> !Boolean.TRUE.equals(usuario.getEmailConfirmado()))
+                .ifPresent(usuario -> {
+                    Instant limite = Instant.now().minus(Duration.ofHours(1));
+                    long reenviosRecentes = tokenUsuarioRepository
+                            .countByUsuarioIdAndTipoAndCriadoEmAfter(
+                                    usuario.getId(), TIPO_CONFIRMACAO_EMAIL, limite);
+
+                    if (reenviosRecentes < maxReenviosPorHora) {
+                        criarTokenEAgendarEmail(usuario);
+                    }
+                });
     }
 
     @Transactional
@@ -96,7 +107,7 @@ public class AuthService {
 
     @Transactional(readOnly = true)
     public AuthResponse autenticar(String email, String senha) {
-        Usuario usuario = usuarioRepository.findByEmailIgnoreCase(email.trim()).orElse(null);
+        Usuario usuario = usuarioRepository.findByEmailIgnoreCase(normalizarEmail(email)).orElse(null);
 
         // Sempre executa BCrypt, inclusive quando a conta não existe ou ainda não foi confirmada.
         String hashArmazenado = usuario != null ? usuario.getSenhaHash() : HASH_SENHA_DUMMY;
@@ -125,11 +136,33 @@ public class AuthService {
         return new AuthResponse(token, "Bearer", expiracaoMinutos * 60);
     }
 
+    private void criarTokenEAgendarEmail(Usuario usuario) {
+        String tokenEmTexto = gerarToken();
+        invalidarTokensAnteriores(usuario);
+
+        TokenUsuario token = new TokenUsuario();
+        token.setUsuario(usuario);
+        token.setTipo(TIPO_CONFIRMACAO_EMAIL);
+        token.setTokenHash(hashToken(tokenEmTexto));
+        token.setCriadoEm(Instant.now());
+        token.setExpiraEm(Instant.now().plus(Duration.ofHours(24)));
+        token.setUsado(false);
+        tokenUsuarioRepository.save(token);
+
+        // O listener envia somente depois do commit, em outra thread.
+        eventPublisher.publishEvent(new EmailConfirmacaoSolicitadoEvent(
+                usuario.getEmail(), tokenEmTexto));
+    }
+
     private void invalidarTokensAnteriores(Usuario usuario) {
         var anteriores = tokenUsuarioRepository.findByUsuarioIdAndTipoAndUsadoFalse(
                 usuario.getId(), TIPO_CONFIRMACAO_EMAIL);
         anteriores.forEach(token -> token.setUsado(true));
         tokenUsuarioRepository.saveAll(anteriores);
+    }
+
+    private String normalizarEmail(String email) {
+        return email.trim().toLowerCase(Locale.ROOT);
     }
 
     private String gerarToken() {

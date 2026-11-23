@@ -37,6 +37,9 @@ public class TokenUsuario {
     @Column(name = "token_hash", nullable = false)
     private String tokenHash;
 
+    @Column(name = "criado_em", nullable = false, updatable = false)
+    private Instant criadoEm = Instant.now();
+
     @Column(name = "expira_em", nullable = false)
     private Instant expiraEm;
 

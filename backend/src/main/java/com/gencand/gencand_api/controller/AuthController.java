@@ -3,6 +3,7 @@ package com.gencand.gencand_api.controller;
 import com.gencand.gencand_api.dto.request.ConfirmacaoEmailRequest;
 import com.gencand.gencand_api.dto.request.LoginRequest;
 import com.gencand.gencand_api.dto.request.RegistroRequest;
+import com.gencand.gencand_api.dto.request.ReenvioConfirmacaoRequest;
 import com.gencand.gencand_api.dto.response.AuthResponse;
 import com.gencand.gencand_api.service.AuthService;
 import jakarta.validation.Valid;
@@ -26,6 +27,16 @@ public class AuthController {
         return ResponseEntity.accepted().body(Map.of(
                 "mensagem",
                 "Se o endereço puder ser cadastrado, enviaremos um link de confirmação."
+        ));
+    }
+
+    @PostMapping("/resend-confirmation")
+    public ResponseEntity<Map<String, String>> reenviarConfirmacao(
+            @Valid @RequestBody ReenvioConfirmacaoRequest request) {
+        authService.reenviarConfirmacao(request.email());
+        return ResponseEntity.accepted().body(Map.of(
+                "mensagem",
+                "Se existir um cadastro pendente para esse endereço, enviaremos um novo link de confirmação."
         ));
     }
 

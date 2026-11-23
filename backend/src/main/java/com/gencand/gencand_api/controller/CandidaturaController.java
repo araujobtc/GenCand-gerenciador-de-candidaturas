@@ -1,5 +1,6 @@
 package com.gencand.gencand_api.controller;
 
+import com.gencand.gencand_api.dto.request.CandidaturaAtualizacaoRequest;
 import com.gencand.gencand_api.dto.request.CandidaturaRequest;
 import com.gencand.gencand_api.dto.request.CandidaturaStatusRequest;
 import com.gencand.gencand_api.dto.response.CandidaturaResponse;
@@ -60,12 +61,12 @@ public class CandidaturaController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    // PUT substitui os campos editáveis; envie todos, inclusive status (null para sem status).
-    // Para alterar somente o status, use PATCH /{id}/status.
+    // O PUT atualiza somente os dados editáveis e preserva o status existente.
+    // Para alterar o status, use exclusivamente PATCH /{id}/status.
     @PutMapping("/{id}")
     public ResponseEntity<CandidaturaResponse> atualizar(
             @PathVariable UUID id,
-            @Valid @RequestBody CandidaturaRequest request,
+            @Valid @RequestBody CandidaturaAtualizacaoRequest request,
             @UsuarioAtual UUID usuarioId) {
         return ResponseEntity.ok(candidaturaService.atualizar(id, request, usuarioId));
     }
