@@ -1,5 +1,6 @@
 package com.gencand.gencand_api.integration;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gencand.gencand_api.entity.Candidatura;
 import com.gencand.gencand_api.entity.Usuario;
 import com.gencand.gencand_api.repository.CandidaturaRepository;
@@ -13,6 +14,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.postgresql.PostgreSQLContainer;
@@ -45,6 +47,7 @@ class CandidaturaTenantIsolationIntegrationTest {
     }
 
     @Autowired private MockMvc mockMvc;
+    @Autowired private ObjectMapper objectMapper;
     @Autowired private UsuarioRepository usuarioRepository;
     @Autowired private CandidaturaRepository candidaturaRepository;
 
@@ -75,18 +78,18 @@ class CandidaturaTenantIsolationIntegrationTest {
     void usuarioBnaoPodeListarConsultarAtualizarOuExcluirCandidaturaDoUsuarioA()
             throws Exception {
         String id = candidaturaDoUsuarioA.getId().toString();
-        var autenticacaoUsuarioB = jwt().jwt(token ->
-                token.subject(usuarioB.getId().toString()));
 
-        mockMvc.perform(get("/api/candidaturas").with(autenticacaoUsuarioB))
+        mockMvc.perform(get("/api/candidaturas")
+                        .with(jwt().jwt(token -> token.subject(usuarioB.getId().toString()))))
                 .andExpect(status().isOk())
                 .andExpect(content().string(not(containsString("Vaga privada do usuário A"))));
 
-        mockMvc.perform(get("/api/candidaturas/{id}", id).with(autenticacaoUsuarioB))
+        mockMvc.perform(get("/api/candidaturas/{id}", id)
+                        .with(jwt().jwt(token -> token.subject(usuarioB.getId().toString()))))
                 .andExpect(status().isNotFound());
 
         mockMvc.perform(put("/api/candidaturas/{id}", id)
-                        .with(autenticacaoUsuarioB)
+                        .with(jwt().jwt(token -> token.subject(usuarioB.getId().toString())))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {
@@ -97,17 +100,118 @@ class CandidaturaTenantIsolationIntegrationTest {
                 .andExpect(status().isNotFound());
 
         mockMvc.perform(patch("/api/candidaturas/{id}/status", id)
-                        .with(autenticacaoUsuarioB)
+                        .with(jwt().jwt(token -> token.subject(usuarioB.getId().toString())))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"status\":\"PASSEI\"}"))
                 .andExpect(status().isNotFound());
 
-        mockMvc.perform(delete("/api/candidaturas/{id}", id).with(autenticacaoUsuarioB))
+        mockMvc.perform(delete("/api/candidaturas/{id}", id)
+                        .with(jwt().jwt(token -> token.subject(usuarioB.getId().toString()))))
                 .andExpect(status().isNotFound());
 
         mockMvc.perform(get("/api/candidaturas/{id}", id)
                         .with(jwt().jwt(token -> token.subject(usuarioA.getId().toString()))))
                 .andExpect(status().isOk());
+    }
+
+    @Test
+    void crudDevePreservarStatusNoPutEAlterarStatusSomenteNoPatch()
+            throws Exception {
+        String jsonCriacao = """
+                {
+                  "titulo": "Desenvolvedora Java",
+                  "empresa": "Empresa de teste",
+                  "status": "CANDIDATADA"
+                }
+                """;
+
+        MvcResult criacao = mockMvc.perform(post("/api/candidaturas")
+                        .with(jwt().jwt(token -> token.subject(usuarioA.getId().toString())))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(jsonCriacao))
+                .andExpect(status().isCreated())
+                .andReturn();
+
+        String id = objectMapper.readTree(criacao.getResponse().getContentAsString())
+                .get("id").asText();
+
+        mockMvc.perform(get("/api/candidaturas/{id}", id)
+                        .with(jwt().jwt(token -> token.subject(usuarioA.getId().toString()))))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value("CANDIDATADA"));
+
+        mockMvc.perform(put("/api/candidaturas/{id}", id)
+                        .with(jwt().jwt(token -> token.subject(usuarioA.getId().toString())))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "titulo": "Desenvolvedora Backend",
+                                  "empresa": "Empresa atualizada",
+                                  "observacao": "Dados revisados"
+                                }
+                                """))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value("CANDIDATADA"));
+
+        mockMvc.perform(patch("/api/candidaturas/{id}/status", id)
+                        .with(jwt().jwt(token -> token.subject(usuarioA.getId().toString())))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"status\":\"PASSEI\"}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value("PASSEI"));
+
+        mockMvc.perform(delete("/api/candidaturas/{id}", id)
+                        .with(jwt().jwt(token -> token.subject(usuarioA.getId().toString()))))
+                .andExpect(status().isNoContent());
+
+        mockMvc.perform(get("/api/candidaturas/{id}", id)
+                        .with(jwt().jwt(token -> token.subject(usuarioA.getId().toString()))))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void endpointsDeAutenticacaoDevemTratarRegistroReenvioConfirmacaoELogin()
+            throws Exception {
+        String email = "novo-cadastro@teste.com";
+
+        mockMvc.perform(post("/api/auth/register")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "email": "novo-cadastro@teste.com",
+                                  "senha": "senha-segura"
+                                }
+                                """))
+                .andExpect(status().isAccepted())
+                .andExpect(jsonPath("$.mensagem").exists());
+
+        org.junit.jupiter.api.Assertions.assertTrue(
+                usuarioRepository.findByEmailIgnoreCase(email).isPresent());
+
+        mockMvc.perform(post("/api/auth/resend-confirmation")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "email": "novo-cadastro@teste.com"
+                                }
+                                """))
+                .andExpect(status().isAccepted())
+                .andExpect(jsonPath("$.mensagem").exists());
+
+        mockMvc.perform(post("/api/auth/confirm-email")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"token\":\"token-invalido\"}"))
+                .andExpect(status().isBadRequest());
+
+        mockMvc.perform(post("/api/auth/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "email": "novo-cadastro@teste.com",
+                                  "senha": "senha-segura"
+                                }
+                                """))
+                .andExpect(status().isUnauthorized());
     }
 
     private Usuario criarUsuario(String email) {
