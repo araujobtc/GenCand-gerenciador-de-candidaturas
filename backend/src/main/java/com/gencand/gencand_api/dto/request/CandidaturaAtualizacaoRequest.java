@@ -13,7 +13,7 @@ import java.util.UUID;
 public record CandidaturaAtualizacaoRequest(
         @NotBlank @Size(max = 255) String titulo,
         @NotBlank @Size(max = 255) String empresa,
-        @Size(max = 2048) String link,
+        @Size(max = 255) String link,
         UUID plataformaId,
         LocalDate dataCandidatura,
         @Size(max = 5000) String observacao

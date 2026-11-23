@@ -10,6 +10,7 @@ import com.gencand.gencand_api.entity.Usuario;
 import com.gencand.gencand_api.repository.CandidaturaRepository;
 import com.gencand.gencand_api.repository.HistoricoStatusRepository;
 import com.gencand.gencand_api.repository.PlataformaRepository;
+import com.gencand.gencand_api.util.ValidacaoUrl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -146,7 +147,7 @@ public class CandidaturaService {
 
         candidatura.setTitulo(titulo.trim());
         candidatura.setEmpresa(empresa.trim());
-        candidatura.setLink(limpar(link));
+        candidatura.setLink(ValidacaoUrl.validarLink(link));
         candidatura.setObservacao(limpar(observacao));
 
         if (dataCandidatura != null) {

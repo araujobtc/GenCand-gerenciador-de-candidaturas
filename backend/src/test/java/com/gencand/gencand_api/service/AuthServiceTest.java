@@ -90,6 +90,7 @@ class AuthServiceTest {
                 authService.registrar("Existente@Exemplo.com", "senha-de-atacante");
 
         assertEquals(AuthService.ResultadoRegistro.JA_CADASTRADO, resultado);
+        verify(passwordEncoder).matches(eq("gencand-cadastro"), anyString());
         verificarNenhumaAlteracaoDeConta();
     }
 
@@ -103,7 +104,20 @@ class AuthServiceTest {
                 authService.registrar("Pendente@Exemplo.com", "senha-de-atacante");
 
         assertEquals(AuthService.ResultadoRegistro.JA_CADASTRADO, resultado);
+        verify(passwordEncoder).matches(eq("gencand-cadastro"), anyString());
         verificarNenhumaAlteracaoDeConta();
+    }
+
+    @Test
+    void reenvioDeveExecutarBcryptMesmoQuandoEmailNaoExiste() {
+        when(usuarioRepository.findByEmailIgnoreCase("inexistente@exemplo.com"))
+                .thenReturn(Optional.empty());
+
+        authService.reenviarConfirmacao("Inexistente@Exemplo.com");
+
+        verify(passwordEncoder).matches(eq("gencand-reenvio"), anyString());
+        verify(tokenUsuarioRepository, never()).save(any());
+        verify(eventPublisher, never()).publishEvent(any(EmailConfirmacaoSolicitadoEvent.class));
     }
 
     @Test
@@ -121,6 +135,7 @@ class AuthServiceTest {
 
         authService.reenviarConfirmacao("Pendente@Exemplo.com");
 
+        verify(passwordEncoder).matches(eq("gencand-reenvio"), anyString());
         verify(tokenUsuarioRepository).save(any());
         ArgumentCaptor<EmailConfirmacaoSolicitadoEvent> evento =
                 ArgumentCaptor.forClass(EmailConfirmacaoSolicitadoEvent.class);

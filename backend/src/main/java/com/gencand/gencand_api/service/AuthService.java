@@ -60,7 +60,8 @@ public class AuthService {
         var usuarioExistente = usuarioRepository.findByEmailIgnoreCase(emailNormalizado);
 
         if (usuarioExistente.isPresent()) {
-            // A senha original nunca é substituída por uma nova tentativa de cadastro.
+            // Mantém o custo de BCrypt semelhante ao caminho de criação, sem alterar a senha.
+            passwordEncoder.matches("gencand-cadastro", HASH_SENHA_DUMMY);
             return ResultadoRegistro.JA_CADASTRADO;
         }
 
@@ -75,6 +76,9 @@ public class AuthService {
 
     @Transactional
     public void reenviarConfirmacao(String email) {
+        // Executa BCrypt em todos os caminhos para reduzir diferenças observáveis de tempo.
+        passwordEncoder.matches("gencand-reenvio", HASH_SENHA_DUMMY);
+
         usuarioRepository.findByEmailIgnoreCase(normalizarEmail(email))
                 .filter(usuario -> !Boolean.TRUE.equals(usuario.getEmailConfirmado()))
                 .ifPresent(usuario -> {

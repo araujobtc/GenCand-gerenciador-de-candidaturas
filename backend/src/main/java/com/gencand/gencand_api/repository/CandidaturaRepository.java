@@ -3,6 +3,7 @@ package com.gencand.gencand_api.repository;
 import com.gencand.gencand_api.entity.Candidatura;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
@@ -10,7 +11,8 @@ import java.util.UUID;
 
 public interface CandidaturaRepository extends JpaRepository<Candidatura, UUID> {
 
-    // Lista paginada so da usuaria logada. Use oculta = false para a lista normal.
+    // Carrega a plataforma junto com a página para evitar consultas N+1.
+    @EntityGraph(attributePaths = "plataforma")
     Page<Candidatura> findByUsuarioIdAndOculta(UUID usuarioId, boolean oculta, Pageable pageable);
 
     // Toda busca por id leva o dono junto: e isso que impede ver dados de outra pessoa.

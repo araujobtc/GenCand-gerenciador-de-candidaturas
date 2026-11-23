@@ -16,7 +16,9 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
+import java.util.Set;
 import java.util.UUID;
 
 @RestController
@@ -25,6 +27,12 @@ import java.util.UUID;
 public class CandidaturaController {
 
     private static final int TAMANHO_MAXIMO_PAGINA = 100;
+    private static final Set<String> CAMPOS_ORDENACAO_PERMITIDOS = Set.of(
+            "dataCandidatura",
+            "dataAtualizacao",
+            "status",
+            "empresa"
+    );
 
     private final CandidaturaService candidaturaService;
 
@@ -37,6 +45,8 @@ public class CandidaturaController {
                     direction = Sort.Direction.DESC
             ) Pageable pageable) {
 
+        validarOrdenacao(pageable);
+
         Pageable paginacaoSegura = PageRequest.of(
                 pageable.getPageNumber(),
                 Math.min(pageable.getPageSize(), TAMANHO_MAXIMO_PAGINA),
@@ -44,6 +54,17 @@ public class CandidaturaController {
 
         return ResponseEntity.ok(new PagedModel<>(
                 candidaturaService.listar(usuarioId, paginacaoSegura)));
+    }
+
+    private void validarOrdenacao(Pageable pageable) {
+        boolean ordenacaoInvalida = pageable.getSort().stream()
+                .anyMatch(order -> !CAMPOS_ORDENACAO_PERMITIDOS.contains(order.getProperty()));
+
+        if (ordenacaoInvalida) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "Campo de ordenação inválido. Campos permitidos: dataCandidatura, dataAtualizacao, status e empresa.");
+        }
     }
 
     @GetMapping("/{id}")

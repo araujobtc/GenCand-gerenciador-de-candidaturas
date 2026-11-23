@@ -21,6 +21,14 @@ A API utiliza Java 25, Spring Boot e PostgreSQL. Para executar localmente, confi
 
 No Render, cadastre essas variáveis em **Environment** no serviço da API. Não coloque chaves ou senhas no repositório. Se as variáveis do Brevo estiverem vazias, o cadastro ainda será persistido, mas o e-mail não será enviado; o erro será registrado sem expor destinatário ou token.
 
+### Banco de dados e migrações
+
+- **PostgreSQL 18 ou superior é obrigatório.** A migração inicial `V1__criar_tabelas.sql` utiliza a função nativa `uuidv7()`, disponível a partir do PostgreSQL 18.
+- O Flyway está configurado com `baseline-on-migrate: true` e `baseline-version: "1"`.
+- Em um banco **não vazio e sem histórico do Flyway** (sem a tabela `flyway_schema_history`), o Flyway cria um baseline na versão 1. Nesse cenário, a migração V1 é considerada já aplicada e **não é executada**; as migrações posteriores (V2, V3 etc.) podem ser executadas normalmente.
+- Essa configuração foi adotada para compatibilizar a aplicação com o banco existente no Neon, cujo esquema já foi criado a partir do modelo da V1. O baseline **não verifica nem corrige** se as tabelas e colunas existentes correspondem à V1. Antes de conectar outro banco não vazio, confirme manualmente que seu esquema é compatível.
+- Em um banco vazio, sem tabelas de aplicação, a V1 é executada normalmente. Não crie manualmente um baseline para um banco vazio.
+
 ### E-mail de confirmação
 
 - O registro cria o usuário e o token dentro da transação.

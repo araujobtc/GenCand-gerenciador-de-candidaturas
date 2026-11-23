@@ -5,6 +5,7 @@ import com.gencand.gencand_api.dto.response.PlataformaResponse;
 import com.gencand.gencand_api.entity.Plataforma;
 import com.gencand.gencand_api.entity.Usuario;
 import com.gencand.gencand_api.repository.PlataformaRepository;
+import com.gencand.gencand_api.util.ValidacaoUrl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -84,7 +85,7 @@ public class PlataformaService {
 
     private void aplicarDados(Plataforma plataforma, PlataformaRequest request) {
         plataforma.setNome(request.nome().trim());
-        plataforma.setDominio(limpar(request.dominio()));
+        plataforma.setDominio(ValidacaoUrl.validarDominio(request.dominio()));
         plataforma.setObservacao(limpar(request.observacao()));
     }
 

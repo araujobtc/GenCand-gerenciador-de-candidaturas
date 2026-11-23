@@ -27,7 +27,7 @@ public class Plataforma {
     @Column(name = "nome", nullable = false)
     private String nome;
 
-    @Column(name = "dominio")
+    @Column(name = "dominio", length = 255)
     private String dominio;
 
     @Column(name = "observacao")
