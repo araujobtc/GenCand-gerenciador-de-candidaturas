@@ -33,11 +33,15 @@ import java.util.Locale;
 @RequiredArgsConstructor
 public class AuthService {
 
+    public enum ResultadoRegistro {
+        CRIADO,
+        JA_CADASTRADO
+    }
+
     private static final String HASH_SENHA_DUMMY =
             "$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy";
     private static final String TIPO_CONFIRMACAO_EMAIL = "CONFIRMAR_EMAIL";
     private static final SecureRandom RANDOM = new SecureRandom();
-
     private final UsuarioRepository usuarioRepository;
     private final TokenUsuarioRepository tokenUsuarioRepository;
     private final PasswordEncoder passwordEncoder;
@@ -51,21 +55,22 @@ public class AuthService {
     private long maxReenviosPorHora = 3;
 
     @Transactional
-    public void registrar(String email, String senha) {
+    public ResultadoRegistro registrar(String email, String senha) {
         String emailNormalizado = normalizarEmail(email);
+        var usuarioExistente = usuarioRepository.findByEmailIgnoreCase(emailNormalizado);
 
-        // Mantém uma resposta externa genérica para não revelar contas existentes.
-        if (usuarioRepository.existsByEmailIgnoreCase(emailNormalizado)) {
-            return;
+        if (usuarioExistente.isPresent()) {
+            // A senha original nunca é substituída por uma nova tentativa de cadastro.
+            return ResultadoRegistro.JA_CADASTRADO;
         }
 
         Usuario usuario = new Usuario();
         usuario.setEmail(emailNormalizado);
         usuario.setSenhaHash(passwordEncoder.encode(senha));
-        usuario.setEmailConfirmado(false);
-        Usuario salvo = usuarioRepository.save(usuario);
+        // O e-mail permanece marcado como não verificado, mas isso não bloqueia o acesso.
+        usuarioRepository.save(usuario);
 
-        criarTokenEAgendarEmail(salvo);
+        return ResultadoRegistro.CRIADO;
     }
 
     @Transactional
@@ -116,7 +121,6 @@ public class AuthService {
         boolean senhaValida = passwordEncoder.matches(senha, hashArmazenado);
 
         if (usuario == null
-                || !Boolean.TRUE.equals(usuario.getEmailConfirmado())
                 || !senhaValida) {
             throw new BadCredentialsException("E-mail ou senha inválidos");
         }

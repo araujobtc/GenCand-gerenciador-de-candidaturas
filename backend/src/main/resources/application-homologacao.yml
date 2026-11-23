@@ -1,0 +1,16 @@
+# Perfil de homologacao: ative com SPRING_PROFILES_ACTIVE=homologacao
+springdoc:
+  api-docs:
+    enabled: true
+  swagger-ui:
+    enabled: true
+
+app:
+  http-logging:
+    enabled: true
+
+logging:
+  level:
+    root: INFO
+    com.gencand: INFO
+    HTTP_ACCESS: INFO

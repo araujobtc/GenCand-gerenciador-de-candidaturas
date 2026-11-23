@@ -47,8 +47,10 @@ app:
   jwt:
     secret: ${JWT_SECRET}
     expiracao-minutos: 60
+  http-logging:
+    enabled: false
   cors:
-    # Informe as origens separadas por vírgula, sem barra no final.
+    # Informe as origens separadas por virgula, sem barra no final.
     allowed-origins: ${FRONTEND_URL:http://localhost:5173}
   frontend-url: ${FRONTEND_URL:http://localhost:5173}
   auth:

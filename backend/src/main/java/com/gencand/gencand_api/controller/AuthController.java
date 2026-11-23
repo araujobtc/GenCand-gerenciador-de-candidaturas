@@ -23,11 +23,17 @@ public class AuthController {
     @PostMapping("/register")
     public ResponseEntity<Map<String, String>> registrar(
             @Valid @RequestBody RegistroRequest request) {
-        authService.registrar(request.email(), request.senha());
-        return ResponseEntity.accepted().body(Map.of(
-                "mensagem",
-                "Se o endereço puder ser cadastrado, enviaremos um link de confirmação."
-        ));
+        AuthService.ResultadoRegistro resultado =
+                authService.registrar(request.email(), request.senha());
+
+        String mensagem = switch (resultado) {
+            case CRIADO ->
+                    "Cadastro realizado com sucesso! Você já pode fazer login.";
+            case JA_CADASTRADO ->
+                    "Já existe uma conta cadastrada com este e-mail. Faça login para acessar sua conta.";
+        };
+
+        return ResponseEntity.accepted().body(Map.of("mensagem", mensagem));
     }
 
     @PostMapping("/resend-confirmation")
