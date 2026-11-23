@@ -1,6 +1,6 @@
 package com.gencand.gencand_api.integration;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
 import com.gencand.gencand_api.entity.Candidatura;
 import com.gencand.gencand_api.entity.Usuario;
 import com.gencand.gencand_api.repository.CandidaturaRepository;
