@@ -82,7 +82,7 @@ class AuthServiceTest {
                 .thenReturn(Optional.of(usuario));
         when(tokenUsuarioRepository.countByUsuarioIdAndTipoAndCriadoEmAfter(
                 eq(usuarioId), eq("CONFIRMAR_EMAIL"), any()))
-                .thenReturn(0L);
+                .thenReturn(1L);
         when(tokenUsuarioRepository.findByUsuarioIdAndTipoAndUsadoFalse(
                 usuarioId, "CONFIRMAR_EMAIL"))
                 .thenReturn(List.of());
@@ -109,7 +109,7 @@ class AuthServiceTest {
                 .thenReturn(Optional.of(usuario));
         when(tokenUsuarioRepository.countByUsuarioIdAndTipoAndCriadoEmAfter(
                 eq(usuarioId), eq("CONFIRMAR_EMAIL"), any()))
-                .thenReturn(3L);
+                .thenReturn(4L);
 
         authService.reenviarConfirmacao("pendente@exemplo.com");
 

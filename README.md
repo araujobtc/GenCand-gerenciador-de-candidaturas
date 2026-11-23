@@ -27,7 +27,7 @@ No Render, cadastre essas variáveis em **Environment** no serviço da API. Não
 - O envio é agendado após o commit e executado de forma assíncrona, para que uma falha no Brevo não desfaça o cadastro.
 - O token é armazenado somente como hash e expira em 24 horas.
 - O endpoint `POST /api/auth/resend-confirmation` permite solicitar novo link para cadastro ainda não confirmado.
-- O reenvio é limitado a 3 solicitações por usuário em uma janela de uma hora.
+- São permitidos até três reenvios por usuário em uma janela de uma hora, além do envio inicial.
 - Os logs de envio bem-sucedido contêm somente assunto e remetente.
 
 ### Testes

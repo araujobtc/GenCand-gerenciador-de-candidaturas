@@ -74,11 +74,13 @@ public class AuthService {
                 .filter(usuario -> !Boolean.TRUE.equals(usuario.getEmailConfirmado()))
                 .ifPresent(usuario -> {
                     Instant limite = Instant.now().minus(Duration.ofHours(1));
-                    long reenviosRecentes = tokenUsuarioRepository
+                    long enviosRecentes = tokenUsuarioRepository
                             .countByUsuarioIdAndTipoAndCriadoEmAfter(
                                     usuario.getId(), TIPO_CONFIRMACAO_EMAIL, limite);
 
-                    if (reenviosRecentes < maxReenviosPorHora) {
+                    // O primeiro envio também entra na contagem; por isso, permite
+                    // até três reenvios adicionais dentro da janela de uma hora.
+                    if (enviosRecentes <= maxReenviosPorHora) {
                         criarTokenEAgendarEmail(usuario);
                     }
                 });
