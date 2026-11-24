@@ -4,6 +4,7 @@ import tools.jackson.databind.ObjectMapper;
 import com.gencand.gencand_api.entity.Candidatura;
 import com.gencand.gencand_api.entity.Usuario;
 import com.gencand.gencand_api.repository.CandidaturaRepository;
+import com.gencand.gencand_api.service.BrevoEmailService;
 import com.gencand.gencand_api.repository.UsuarioRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -11,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
@@ -50,6 +52,7 @@ class CandidaturaTenantIsolationIntegrationTest {
     @Autowired private ObjectMapper objectMapper;
     @Autowired private UsuarioRepository usuarioRepository;
     @Autowired private CandidaturaRepository candidaturaRepository;
+    @MockitoBean private BrevoEmailService brevoEmailService;
 
     private Usuario usuarioA;
     private Usuario usuarioB;
