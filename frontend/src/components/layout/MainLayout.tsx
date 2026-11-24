@@ -12,9 +12,8 @@ export default function MainLayout({ title, children }: { title: string; childre
   return (
     <div className={styles.shell}>
       <aside className={styles.sidebar}>
-        <Link to="/candidaturas" className={styles.brand}>
-          <span className={styles.mark} aria-hidden="true">✓</span>
-          <span><b>Organizador</b><small>de candidaturas</small></span>
+        <Link to="/candidaturas" className={styles.brand} aria-label="Organizador de candidaturas">
+          <img className={styles.brandLogo} src="/logo-gencand.svg" alt="GenCand — Organizador de candidaturas" />
         </Link>
         <nav className={styles.nav} aria-label="Navegação principal">
           <span className={styles.navItem} aria-disabled="true" title="Disponível em versão futura">▦  Painel</span>

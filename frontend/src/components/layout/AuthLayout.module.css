@@ -51,41 +51,24 @@
 .brand {
   position: relative;
   z-index: 1;
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  gap: 16px;
-  color: inherit;
+  width: fit-content;
   text-decoration: none;
 }
 
-.brandMark {
-  width: 44px;
-  height: 44px;
-  border-radius: 12px;
-  background: #fff;
-  color: #3157D5;
-  display: grid;
-  place-items: center;
-  font-size: 29px;
-  font-weight: 600;
-}
-
-.brand strong,
-.brand small {
+.brandLogo {
   display: block;
+  width: 320px;
+  max-width: 100%;
+  height: auto;
+  filter: brightness(0) invert(1);
 }
 
-.brand strong {
-  font-family: Poppins, Arial, sans-serif;
-  font-size: 18px;
-  font-weight: 600;
-  line-height: 20px;
-}
-
-.brand small {
-  font-size: 13px;
-  color: #DCE4FF;
-  line-height: 19px;
+.brand:focus-visible {
+  outline: 3px solid #fff;
+  outline-offset: 5px;
+  border-radius: 3px;
 }
 
 .pitch {
