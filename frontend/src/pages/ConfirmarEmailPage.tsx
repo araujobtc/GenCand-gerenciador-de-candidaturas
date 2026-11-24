@@ -13,6 +13,11 @@ function confirmarUmaVez(token: string): Promise<void> {
   if (!requisicao) {
     requisicao = authService.confirmarEmail({ token }).then(() => undefined)
     confirmacoesEmAndamento.set(token, requisicao)
+    void requisicao.catch(() => {
+      if (confirmacoesEmAndamento.get(token) === requisicao) {
+        confirmacoesEmAndamento.delete(token)
+      }
+    })
   }
   return requisicao
 }

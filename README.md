@@ -1,56 +1,90 @@
-# GenCand — Controle de candidaturas
+# GenCand — Organizador de Candidaturas
 
-Aplicação para registrar e acompanhar candidaturas a vagas de emprego.
+Aplicação web para registrar e acompanhar candidaturas a vagas de emprego.
 
-## Estrutura
+## Estrutura do repositório
 
 - `frontend/`: aplicação web React, TypeScript e Vite.
-- `backend/`: API Java com Spring Boot.
+- `backend/`: API Java com Spring Boot e PostgreSQL.
 
 ## Requisitos
 
-- Node.js compatível com a versão do Vite utilizada no projeto.
+- Node.js 22 ou versão compatível com o Vite utilizado no projeto.
 - npm.
-- API GenCand em execução para utilizar autenticação e persistência.
+- Java 25.
+- Docker, para executar os testes de integração do backend com Testcontainers.
+- PostgreSQL 18 ou superior para executar o backend com o banco real. A migração inicial utiliza a função `uuidv7()`.
 
 ## Executar o frontend
 
-No terminal, entre na pasta `frontend` e instale as dependências:
-
-```bash
-cd frontend
-npm install
-```
-
-Crie um arquivo `.env.local` a partir de `.env.example` e configure a URL base da API:
+Na pasta `frontend`, configure `.env.local` com a URL base da API (sem o sufixo `/api`):
 
 ```env
 GENCAND_API_URL=http://localhost:8080
 ```
 
-A variável deve conter a URL base do backend, sem acrescentar `/api`.
-
-Inicie o servidor de desenvolvimento:
+Instale as dependências e inicie a aplicação:
 
 ```bash
+cd frontend
+npm install
 npm run dev
 ```
 
-## Verificações do frontend
-
-Na pasta `frontend`:
+Verificações disponíveis:
 
 ```bash
 npm run lint
 npm run build
 ```
 
-O comando de build executa a verificação TypeScript e gera os arquivos de produção em `frontend/dist`.
+O build também executa a verificação de tipos TypeScript.
 
-## Configuração de produção
+## Executar o backend
 
-Configure `GENCAND_API_URL` no ambiente de build do frontend para apontar para a URL pública da API. Não coloque senhas, tokens privados ou outras credenciais no frontend.
+Configure as variáveis de ambiente necessárias:
 
-## Escopo atual
+| Variável | Finalidade |
+| --- | --- |
+| `DATABASE_URL` | URL JDBC do PostgreSQL |
+| `DATABASE_USER` | Usuário do banco |
+| `DATABASE_PASSWORD` | Senha do banco |
+| `JWT_SECRET` | Segredo JWT com pelo menos 32 caracteres |
+| `BREVO_API_KEY` | Chave de API do Brevo para e-mails transacionais |
+| `BREVO_REMETENTE_EMAIL` | Endereço de remetente verificado no Brevo |
+| `BREVO_REMETENTE_NOME` | Nome exibido como remetente (opcional) |
+| `FRONTEND_URL` | URL/origem do frontend usada nos links de autenticação |
 
-A versão inicial contempla cadastro, login, confirmação de e-mail e gerenciamento de candidaturas. Funcionalidades como gerenciamento de plataformas e recuperação de senha ainda não estão disponíveis nesta versão.
+Na pasta `backend`, execute:
+
+```bash
+./mvnw spring-boot:run
+```
+
+Para executar os testes:
+
+```bash
+./mvnw --batch-mode --no-transfer-progress test
+```
+
+Os testes de integração utilizam Testcontainers e precisam de Docker disponível.
+
+## Funcionalidades contempladas
+
+- Cadastro, confirmação de e-mail, login e recuperação de senha.
+- Gerenciamento de candidaturas.
+- Associação de candidaturas a plataformas.
+- Isolamento dos dados por usuário.
+
+A recuperação de senha utiliza `POST /api/auth/forgot-password` e `POST /api/auth/reset-password`. O token é de uso único e expira em uma hora.
+
+## Banco de dados e migrações
+
+O Flyway está habilitado e utiliza `baseline-on-migrate: true`, com versão de baseline 1. Em bancos não vazios sem histórico do Flyway, a V1 é considerada aplicada e não é executada; o baseline não valida nem corrige o esquema existente.
+
+**Antes de publicar alterações de migração, confira a tabela `flyway_schema_history` do ambiente.** A V3 foi modificada durante o desenvolvimento; se uma versão anterior dela já tiver sido aplicada, será necessário planejar a reconciliação do checksum antes do deploy. Não altere o histórico manualmente sem avaliar o estado real do banco.
+
+## Documentação específica
+
+- [Documentação do frontend](frontend/README.md)
+- [Documentação do backend](backend/README.md)
