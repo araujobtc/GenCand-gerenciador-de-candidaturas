@@ -1,10 +1,8 @@
-import { createContext, useEffect, useState, type ReactNode } from 'react'
+import { useEffect, useState, type ReactNode } from 'react'
 import { authService } from '../../../api/services/authService'
-import { removerToken, salvarToken } from '../../../api/apiClient'
+import { CHAVE_TOKEN, removerToken, salvarToken } from '../../../api/apiClient'
+import { AuthContext } from './AuthContextValue'
 import type { AuthContextValue } from '../../../types/authContext'
-
-export const AuthContext = createContext<AuthContextValue | undefined>(undefined)
-const CHAVE_TOKEN = 'gencand_access_token'
 
 type AuthProviderProps = { children: ReactNode }
 

@@ -3,9 +3,15 @@ import { Link } from 'react-router-dom'
 import { candidaturaService } from '../api/services/candidaturaService'
 import { useCandidaturas } from '../hooks/useCandidaturas'
 import type { StatusCandidatura } from '../types/candidatura'
-import { formatarData } from '../utils/date'
+import { formatarData, formatarDataHoraLocal } from '../utils/date'
 import MainLayout from '../components/layout/MainLayout'
 import styles from './ApplicationPages.module.css'
+
+function obterLinkSeguro(valor: string | null): string | null {
+  if (!valor) return null
+  try { const url = new URL(valor); return url.protocol === 'http:' || url.protocol === 'https:' ? url.href : null }
+  catch { return null }
+}
 
 const labels: Record<StatusCandidatura, string> = {
   BANCO_DE_TALENTOS: 'Banco de talentos',
@@ -103,7 +109,7 @@ function CandidaturasPage() {
                   </td>
                   <td>{item.plataformaNome ?? '—'}</td>
                   <td>{formatarData(item.dataCandidatura)}</td>
-                  <td>{formatarData(item.dataAtualizacao)}</td>
+                  <td>{formatarDataHoraLocal(item.dataAtualizacao)}</td>
                   <td>
                     <label className={styles.visuallyHidden} htmlFor={`status-${item.id}`}>Status de {item.titulo}</label>
                     <select
@@ -122,7 +128,7 @@ function CandidaturasPage() {
                   </td>
                   <td>
                     <div className={styles.rowActions}>
-                      {item.link && <a href={item.link} target="_blank" rel="noreferrer">Abrir ↗</a>}
+                      {obterLinkSeguro(item.link) && <a href={obterLinkSeguro(item.link)!} target="_blank" rel="noopener noreferrer">Abrir ↗</a>}
                       <Link to={`/candidaturas/${item.id}/editar`}>Editar</Link>
                       <button
                         className={styles.danger}

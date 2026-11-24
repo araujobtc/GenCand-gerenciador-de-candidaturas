@@ -17,14 +17,14 @@ export default function MainLayout({ title, children }: { title: string; childre
           <span><b>Organizador</b><small>de candidaturas</small></span>
         </Link>
         <nav className={styles.nav} aria-label="Navegação principal">
-          <span className={styles.navItem} aria-disabled="true" title="Disponível em versão futura">▦　Painel</span>
-          <Link className={candidaturasAtiva ? styles.active : styles.navItem} to="/candidaturas">▤　Candidaturas</Link>
-          <span className={styles.navItem} aria-disabled="true" title="Disponível em versão futura">▧　Plataformas</span>
-          <span className={styles.navItem} aria-disabled="true" title="Disponível em versão futura">▤　Currículos</span>
-          <span className={styles.navItem} aria-disabled="true" title="Disponível em versão futura">⚙　Configurações</span>
+          <span className={styles.navItem} aria-disabled="true" title="Disponível em versão futura">▦  Painel</span>
+          <Link className={candidaturasAtiva ? styles.active : styles.navItem} to="/candidaturas">▤  Candidaturas</Link>
+          <span className={styles.navItem} aria-disabled="true" title="Disponível em versão futura">▧  Plataformas</span>
+          <span className={styles.navItem} aria-disabled="true" title="Disponível em versão futura">▤  Currículos</span>
+          <span className={styles.navItem} aria-disabled="true" title="Disponível em versão futura">⚙  Configurações</span>
         </nav>
         <div className={styles.sidebarBottom}>
-          <span aria-disabled="true">‹　Recolher menu</span>
+          <span aria-disabled="true">‹  Recolher menu</span>
           <div className={styles.profile}>
             <span className={styles.avatar} aria-hidden="true">GC</span>
             <span><b>Minha conta</b><small>Conta GenCand</small></span>

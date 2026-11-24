@@ -29,7 +29,13 @@ export function useCandidaturas() {
     }
   }, [numeroPagina])
 
-  useEffect(() => { void carregar() }, [carregar])
+  useEffect(() => {
+    let ativo = true
+    void Promise.resolve().then(() => {
+      if (ativo) return carregar()
+    })
+    return () => { ativo = false }
+  }, [carregar])
 
   return { candidaturas, pagina, numeroPagina, setNumeroPagina, carregando, erro, recarregar: carregar, atualizarNaLista }
 }

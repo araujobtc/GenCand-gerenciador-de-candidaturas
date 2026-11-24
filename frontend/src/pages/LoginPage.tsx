@@ -39,7 +39,7 @@ function LoginPage() {
           <span>Senha</span>
           <input type="password" placeholder="••••••••••" value={senha} onChange={e => setSenha(e.target.value)} required autoComplete="current-password" />
         </label>
-        <div style={{ textAlign: 'right', marginTop: -18, marginBottom: 20, display: 'flex', flexDirection: 'column', gap: 6 }}>
+        <div className={styles.authLinks}>
           <Link className={styles.textLink} to="/recuperar-senha">Esqueci minha senha</Link>
           <Link className={styles.textLink} to={`/confirmar-email?email=${encodeURIComponent(email)}`}>Não recebeu o link de confirmação?</Link>
         </div>

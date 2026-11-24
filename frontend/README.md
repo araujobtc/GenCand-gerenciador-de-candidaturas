@@ -1,75 +1,66 @@
-# React + TypeScript + Vite
+# GenCand — Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Aplicação web do **GenCand**, um organizador de candidaturas a vagas de emprego.
 
-Currently, two official plugins are available:
+## Tecnologias
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- React
+- TypeScript
+- Vite
+- React Router
+- CSS Modules
 
-## React Compiler
+## Requisitos
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- Node.js 22 ou versão compatível com Vite 8
+- npm
 
-## Expanding the ESLint configuration
+## Configuração
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+Na pasta `frontend`, crie um arquivo `.env.local` com a URL base da API:
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-
+```env
+GENCAND_API_URL=http://localhost:8080
 ```
 
-You can also install [eslint-plugin-react-x](https://npmx.dev/package/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://npmx.dev/package/eslint-plugin-react-dom) for React-specific lint rules:
+A variável deve conter somente a origem da API, sem o sufixo `/api`.
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+## Executar em desenvolvimento
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-
+```bash
+npm install
+npm run dev
 ```
+
+## Verificações
+
+```bash
+npm run lint
+npm run build
+```
+
+O comando de build executa a verificação de tipos do TypeScript e gera os arquivos de produção em `dist/`.
+
+## Scripts disponíveis
+
+| Comando | Descrição |
+| --- | --- |
+| `npm run dev` | Inicia o servidor local de desenvolvimento |
+| `npm run lint` | Executa o ESLint |
+| `npm run build` | Verifica os tipos e gera a versão de produção |
+| `npm run preview` | Disponibiliza localmente a versão de produção |
+
+## Estrutura principal
+
+- `src/api`: cliente HTTP e serviços de comunicação com a API.
+- `src/features/auth`: contexto e estado de autenticação.
+- `src/components`: componentes reutilizáveis.
+- `src/pages`: telas da aplicação.
+- `src/routes`: definição das rotas públicas e privadas.
+- `src/hooks`: hooks compartilhados.
+- `src/types`: tipos TypeScript.
+- `src/utils`: funções utilitárias.
+
+## Autenticação
+
+O token de acesso é mantido em `sessionStorage`. A API é responsável pela autenticação, confirmação de e-mail, recuperação de senha e isolamento dos dados de cada usuário.

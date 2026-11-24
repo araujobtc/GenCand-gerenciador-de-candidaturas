@@ -26,3 +26,11 @@ export function converterDataParaISO(data: string): string | null {
   }
   return anoTexto + '-' + mesTexto + '-' + diaTexto
 }
+
+
+export function formatarDataHoraLocal(valor: string | null | undefined): string {
+  if (!valor) return '—'
+  const data = new Date(valor)
+  if (Number.isNaN(data.getTime())) return '—'
+  return data.toLocaleDateString('pt-BR')
+}

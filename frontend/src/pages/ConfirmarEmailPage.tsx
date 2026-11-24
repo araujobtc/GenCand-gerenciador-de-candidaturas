@@ -4,13 +4,24 @@ import { authService } from '../api/services/authService'
 import { ApiError } from '../api/apiClient'
 import styles from './ConfirmarEmailPage.module.css'
 
-type Estado = 'carregando' | 'sucesso' | 'expirado' | 'falha'
+type Estado = 'carregando' | 'sucesso' | 'expirado' | 'sem-token' | 'falha'
+
+const confirmacoesEmAndamento = new Map<string, Promise<void>>()
+
+function confirmarUmaVez(token: string): Promise<void> {
+  let requisicao = confirmacoesEmAndamento.get(token)
+  if (!requisicao) {
+    requisicao = authService.confirmarEmail({ token }).then(() => undefined)
+    confirmacoesEmAndamento.set(token, requisicao)
+  }
+  return requisicao
+}
 
 function ConfirmarEmailPage() {
   const [params] = useSearchParams()
   const token = params.get('token') ?? ''
   const [email, setEmail] = useState(params.get('email') ?? '')
-  const [estado, setEstado] = useState<Estado>(token ? 'carregando' : 'expirado')
+  const [estado, setEstado] = useState<Estado>(token ? 'carregando' : 'sem-token')
   const [reenviando, setReenviando] = useState(false)
   const [mensagem, setMensagem] = useState('')
   const [erro, setErro] = useState('')
@@ -19,7 +30,7 @@ function ConfirmarEmailPage() {
     if (!token) return
     let ativo = true
 
-    authService.confirmarEmail({ token })
+    confirmarUmaVez(token)
       .then(() => {
         if (ativo) setEstado('sucesso')
       })
@@ -68,13 +79,13 @@ function ConfirmarEmailPage() {
     )
   }
 
-  if (estado === 'expirado') {
+  if (estado === 'expirado' || estado === 'sem-token') {
     return (
       <main className={styles.page}>
         <section className={styles.cardExpired} aria-labelledby="status-title">
           <div className={styles.iconWrap}><div className={styles.expiredIcon} aria-hidden="true"><span /></div></div>
-          <h1 id="status-title">Link de confirmação expirado</h1>
-          <p className={styles.description}>O prazo de validade deste link terminou.<br />Informe seu e-mail para receber um novo link.</p>
+          <h1 id="status-title">{estado === 'sem-token' ? 'Link de confirmação não informado' : 'Link de confirmação inválido ou expirado'}</h1>
+          <p className={styles.description}>{estado === 'sem-token' ? 'O endereço acessado não contém um link de confirmação.' : 'Este link não é mais válido. Informe seu e-mail para receber uma nova mensagem de confirmação.'}</p>
           <form className={styles.resendForm} onSubmit={solicitarNovoLink}>
             <label htmlFor="email">E-mail cadastrado</label>
             <input id="email" type="email" placeholder="seuemail@exemplo.com" value={email} onChange={event => setEmail(event.target.value)} required autoComplete="email" maxLength={254} />

@@ -64,12 +64,12 @@ function CadastroPage() {
           <span>Senha</span>
           <input type="password" placeholder="••••••••••" value={senha} onChange={e => setSenha(e.target.value)} required minLength={8} maxLength={72} autoComplete="new-password" />
         </label>
-        <p style={{ fontSize: 12, color: '#647087', marginTop: -17, marginBottom: 20 }}>Mínimo de 8 caracteres.</p>
+        <p className={styles.fieldHint}>Mínimo de 8 caracteres.</p>
         <label className={styles.field}>
           <span>Confirmar senha</span>
           <input type="password" placeholder="••••••••••" value={confirmarSenha} onChange={e => setConfirmarSenha(e.target.value)} required minLength={8} autoComplete="new-password" />
         </label>
-        <p style={{ fontSize: 12, color: '#647087', margin: '-2px 0 24px' }}>Enviaremos um link de confirmação para o endereço informado.</p>
+        <p className={styles.fieldHint}>Enviaremos um link de confirmação para o endereço informado.</p>
         {mensagem && <p className={styles.message} role="status">{mensagem}</p>}
         {erro && <p className={styles.error} role="alert">{erro}</p>}
         <button className={styles.primary} type="submit" disabled={carregando}>{carregando ? 'Enviando...' : 'Criar conta'}</button>
