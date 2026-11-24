@@ -12,6 +12,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDate;
+import java.time.Instant;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -47,6 +48,7 @@ class CandidaturaServiceTest {
         candidatura.setTitulo("Desenvolvedora Java");
         candidatura.setEmpresa("Empresa anterior");
         candidatura.setStatus("CANDIDATADA");
+        candidatura.setDataAtualizacao(Instant.parse("2026-10-10T10:00:00Z"));
         candidatura.setDataCandidatura(LocalDate.of(2026, 10, 10));
 
         when(candidaturaRepository.findByIdAndUsuarioId(candidaturaId, usuarioId))
@@ -67,6 +69,9 @@ class CandidaturaServiceTest {
         assertEquals("CANDIDATADA", candidatura.getStatus());
         assertEquals("CANDIDATADA", resposta.status());
         assertEquals("Nova empresa", resposta.empresa());
+        org.junit.jupiter.api.Assertions.assertTrue(
+                candidatura.getDataAtualizacao().isAfter(Instant.parse("2026-10-10T10:00:00Z")));
+        assertEquals(candidatura.getDataAtualizacao(), resposta.dataAtualizacao());
         verify(historicoStatusRepository, never()).save(any());
     }
 }

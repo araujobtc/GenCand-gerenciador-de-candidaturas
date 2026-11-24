@@ -39,7 +39,7 @@ public class AuthExceptionHandler {
         problema.setProperty("errors", exception.getBindingResult().getFieldErrors().stream()
                 .map(erro -> Map.of(
                         "field", erro.getField(),
-                        "message", "Valor inválido."
+                        "message", erro.getDefaultMessage() == null ? "Valor inválido." : erro.getDefaultMessage()
                 ))
                 .toList());
         return problema;

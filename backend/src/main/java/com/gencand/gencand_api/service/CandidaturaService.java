@@ -75,6 +75,7 @@ public class CandidaturaService {
         aplicarDadosComuns(candidatura, request.titulo(), request.empresa(),
                 request.link(), request.plataformaId(), request.dataCandidatura(),
                 request.observacao(), usuarioId);
+        candidatura.setDataAtualizacao(Instant.now());
 
         return paraResponse(candidaturaRepository.save(candidatura));
     }
