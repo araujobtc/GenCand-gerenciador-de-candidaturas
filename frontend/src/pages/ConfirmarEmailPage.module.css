@@ -1,0 +1,114 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;650;700&family=Poppins:wght@600;700&display=swap');
+
+.page {
+  min-height: 100vh;
+  min-height: 100dvh;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  padding: 48px 24px 86px;
+  background: #F7F9FD;
+  color: #172B4D;
+  font-family: Inter, Arial, sans-serif;
+}
+.page::before, .page::after {
+  content: "";
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 0;
+}
+.page::before { width: 460px; height: 460px; right: -40px; top: -115px; background: #EAF0FF; opacity: .52; }
+.page::after { width: 420px; height: 420px; left: -80px; bottom: -230px; background: #E8FAF9; opacity: .55; }
+.card, .cardExpired {
+  position: relative;
+  z-index: 1;
+  width: min(600px, 100%);
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 58px 64px 40px;
+  border: 1px solid #E8EDF5;
+  border-radius: 22px;
+  background: #fff;
+  box-shadow: 0 12px 40px rgba(21, 43, 87, .08);
+  text-align: center;
+}
+.card { min-height: 485px; }
+.cardExpired { min-height: 650px; padding-top: 52px; }
+.iconWrap { height: 118px; display: flex; align-items: flex-start; justify-content: center; }
+.successIcon, .expiredIcon, .failureIcon {
+  width: 84px; height: 84px; border-radius: 50%;
+  display: grid; place-items: center; position: relative;
+}
+.successIcon { background: linear-gradient(135deg, #12C9C0, #00AFA9); box-shadow: 0 0 0 16px #E7FAF8; }
+.successIcon span { width: 42px; height: 22px; border-left: 7px solid #fff; border-bottom: 7px solid #fff; transform: rotate(-45deg) translate(3px, -3px); border-radius: 2px; }
+.expiredIcon, .failureIcon { background: #F3A640; box-shadow: 0 0 0 16px #FFF4E5; }
+.expiredIcon::before { content: ""; width: 44px; height: 44px; border: 5px solid white; border-radius: 50%; }
+.expiredIcon span { position: absolute; width: 5px; height: 18px; border-radius: 3px; background: white; top: 23px; left: 42px; transform: rotate(-45deg); transform-origin: bottom; }
+.failureIcon span { color: white; font-size: 42px; font-weight: 600; line-height: 1; }
+.card h1, .cardExpired h1 {
+  margin: 0 0 26px;
+  color: #172B4D;
+  font: 700 29px/1.25 Poppins, Inter, Arial, sans-serif;
+}
+.description { margin: 0; color: #63738E; font-size: 16px; line-height: 27px; }
+.primary {
+  min-height: 58px;
+  width: min(390px, 100%);
+  box-sizing: border-box;
+  margin-top: 75px;
+  padding: 0 24px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  border: 0;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #1557E8, #1746C8);
+  color: white;
+  text-decoration: none;
+  font: 600 16px Inter, Arial, sans-serif;
+  cursor: pointer;
+}
+.primary:hover { filter: brightness(.97); }
+.primary:focus-visible, .loginLink:focus-visible, .resendForm input:focus-visible {
+  outline: 3px solid #3157D5;
+  outline-offset: 3px;
+}
+.primary:disabled { opacity: .65; cursor: wait; }
+.helper { margin: 35px 0 0; color: #8A98AE; font-size: 13px; line-height: 20px; }
+.cardExpired .iconWrap { height: 118px; }
+.cardExpired h1 { margin-bottom: 26px; font-size: 29px; }
+.resendForm { width: min(390px, 100%); margin-top: 70px; text-align: left; }
+.resendForm label { display: block; margin-bottom: 8px; color: #263653; font-size: 14px; font-weight: 600; }
+.resendForm input {
+  width: 100%; height: 56px; box-sizing: border-box; padding: 0 21px;
+  border: 1.4px solid #CFD8E6; border-radius: 9px; background: white;
+  color: #263653; font: 15px Inter, Arial, sans-serif;
+}
+.resendForm input::placeholder { color: #9AA6B8; }
+.resendForm .primary { margin-top: 32px; width: 100%; }
+.loginPrompt { margin: 39px 0 12px; color: #63738E; font-size: 14px; }
+.loginLink { color: #1557E8; text-decoration: none; font-size: 14px; font-weight: 650; }
+.feedback, .error { max-width: 390px; margin: 12px 0 0; font-size: 13px; line-height: 19px; }
+.feedback { color: #3157D5; }
+.error { color: #B42318; }
+.page footer { position: absolute; bottom: 65px; z-index: 1; color: #91A0B5; font-size: 13px; text-align: center; }
+.loading { position: relative; z-index: 1; color: #63738E; font-size: 16px; }
+@media (max-width: 640px) {
+  .page { padding: 24px 16px 76px; }
+  .card, .cardExpired { padding: 42px 24px 32px; min-height: 0; }
+  .card h1, .cardExpired h1 { font-size: 23px; }
+  .description { font-size: 14px; line-height: 24px; }
+  .primary { margin-top: 48px; font-size: 14px; }
+  .helper { margin-top: 26px; }
+  .resendForm { margin-top: 46px; }
+  .loginPrompt { margin-top: 30px; }
+  .page footer { position: relative; bottom: auto; margin-top: 32px; font-size: 11px; }
+}
