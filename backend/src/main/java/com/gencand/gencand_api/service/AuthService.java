@@ -33,15 +33,14 @@ import java.util.Locale;
 @RequiredArgsConstructor
 public class AuthService {
 
-    public enum ResultadoRegistro {
-        CRIADO,
-        JA_CADASTRADO
-    }
+    public enum ResultadoRegistro { SOLICITACAO_RECEBIDA }
 
     private static final String HASH_SENHA_DUMMY =
             "$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy";
     private static final String TIPO_CONFIRMACAO_EMAIL = "CONFIRMAR_EMAIL";
+    private static final String TIPO_RECUPERACAO_SENHA = "RECUPERAR_SENHA";
     private static final SecureRandom RANDOM = new SecureRandom();
+
     private final UsuarioRepository usuarioRepository;
     private final TokenUsuarioRepository tokenUsuarioRepository;
     private final PasswordEncoder passwordEncoder;
@@ -54,61 +53,55 @@ public class AuthService {
     @Value("${app.auth.confirmacao.max-reenvios-por-hora:3}")
     private long maxReenviosPorHora = 3;
 
+    @Value("${app.auth.recuperacao.max-solicitacoes-por-hora:3}")
+    private long maxSolicitacoesRecuperacaoPorHora = 3;
+
     @Transactional
     public ResultadoRegistro registrar(String email, String senha) {
         String emailNormalizado = normalizarEmail(email);
-        var usuarioExistente = usuarioRepository.findByEmailIgnoreCase(emailNormalizado);
+        Usuario usuario = usuarioRepository.findByEmailIgnoreCase(emailNormalizado).orElse(null);
 
-        if (usuarioExistente.isPresent()) {
-            // Mantém o custo de BCrypt semelhante ao caminho de criação, sem alterar a senha.
+        if (usuario == null) {
+            usuario = new Usuario();
+            usuario.setEmail(emailNormalizado);
+            usuario.setSenhaHash(passwordEncoder.encode(senha));
+            usuario.setEmailConfirmado(false);
+            usuario = usuarioRepository.saveAndFlush(usuario);
+            criarTokenEAgendarEmail(usuario, TIPO_CONFIRMACAO_EMAIL);
+        } else {
+            // Mantém custo de BCrypt semelhante ao caminho de criação e não revela
+            // se a conta existe; nunca substitui a senha já cadastrada.
             passwordEncoder.matches("gencand-cadastro", HASH_SENHA_DUMMY);
-            return ResultadoRegistro.JA_CADASTRADO;
+            if (!Boolean.TRUE.equals(usuario.getEmailConfirmado())) {
+                agendarConfirmacaoSeDentroDoLimite(usuario);
+            }
         }
 
-        Usuario usuario = new Usuario();
-        usuario.setEmail(emailNormalizado);
-        usuario.setSenhaHash(passwordEncoder.encode(senha));
-        // O e-mail permanece marcado como não verificado, mas isso não bloqueia o acesso.
-        usuarioRepository.save(usuario);
-
-        return ResultadoRegistro.CRIADO;
+        return ResultadoRegistro.SOLICITACAO_RECEBIDA;
     }
 
     @Transactional
     public void reenviarConfirmacao(String email) {
-        // Executa BCrypt em todos os caminhos para reduzir diferenças observáveis de tempo.
         passwordEncoder.matches("gencand-reenvio", HASH_SENHA_DUMMY);
-
         usuarioRepository.findByEmailIgnoreCase(normalizarEmail(email))
                 .filter(usuario -> !Boolean.TRUE.equals(usuario.getEmailConfirmado()))
-                .ifPresent(usuario -> {
-                    Instant limite = Instant.now().minus(Duration.ofHours(1));
-                    long enviosRecentes = tokenUsuarioRepository
-                            .countByUsuarioIdAndTipoAndCriadoEmAfter(
-                                    usuario.getId(), TIPO_CONFIRMACAO_EMAIL, limite);
+                .ifPresent(this::agendarConfirmacaoSeDentroDoLimite);
+    }
 
-                    // O primeiro envio também entra na contagem; por isso, permite
-                    // até três reenvios adicionais dentro da janela de uma hora.
-                    if (enviosRecentes <= maxReenviosPorHora) {
-                        criarTokenEAgendarEmail(usuario);
-                    }
-                });
+    private void agendarConfirmacaoSeDentroDoLimite(Usuario usuario) {
+        Instant limite = Instant.now().minus(Duration.ofHours(1));
+        long enviosRecentes = tokenUsuarioRepository
+                .countByUsuarioIdAndTipoAndCriadoEmAfter(
+                        usuario.getId(), TIPO_CONFIRMACAO_EMAIL, limite);
+        // Um envio inicial + no máximo maxReenviosPorHora reenvios.
+        if (enviosRecentes <= maxReenviosPorHora) {
+            criarTokenEAgendarEmail(usuario, TIPO_CONFIRMACAO_EMAIL);
+        }
     }
 
     @Transactional
     public void confirmarEmail(String tokenEmTexto) {
-        TokenUsuario token = tokenUsuarioRepository.findByTokenHash(hashToken(tokenEmTexto))
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.BAD_REQUEST, "Link de confirmação inválido ou expirado"));
-
-        if (!TIPO_CONFIRMACAO_EMAIL.equals(token.getTipo())
-                || Boolean.TRUE.equals(token.getUsado())
-                || token.getExpiraEm() == null
-                || !token.getExpiraEm().isAfter(Instant.now())) {
-            throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST, "Link de confirmação inválido ou expirado");
-        }
-
+        TokenUsuario token = buscarTokenValido(tokenEmTexto, TIPO_CONFIRMACAO_EMAIL);
         Usuario usuario = token.getUsuario();
         usuario.setEmailConfirmado(true);
         token.setUsado(true);
@@ -116,22 +109,66 @@ public class AuthService {
         tokenUsuarioRepository.save(token);
     }
 
+    @Transactional
+    public void solicitarRecuperacaoSenha(String email) {
+        passwordEncoder.matches("gencand-recuperacao", HASH_SENHA_DUMMY);
+        usuarioRepository.findByEmailIgnoreCase(normalizarEmail(email)).ifPresent(usuario -> {
+            Instant limite = Instant.now().minus(Duration.ofHours(1));
+            long solicitacoes = tokenUsuarioRepository
+                    .countByUsuarioIdAndTipoAndCriadoEmAfter(
+                            usuario.getId(), TIPO_RECUPERACAO_SENHA, limite);
+            if (solicitacoes < maxSolicitacoesRecuperacaoPorHora) {
+                criarTokenEAgendarRecuperacao(usuario);
+            }
+        });
+    }
+
+    @Transactional
+    public void redefinirSenha(String tokenEmTexto, String novaSenha) {
+        TokenUsuario token = buscarTokenValido(tokenEmTexto, TIPO_RECUPERACAO_SENHA);
+        Usuario usuario = token.getUsuario();
+        usuario.setSenhaHash(passwordEncoder.encode(novaSenha));
+        // O link de recuperação enviado ao endereço comprova sua posse.
+        usuario.setEmailConfirmado(true);
+        token.setUsado(true);
+        usuarioRepository.save(usuario);
+        tokenUsuarioRepository.save(token);
+        invalidarTokensAnteriores(usuario, TIPO_RECUPERACAO_SENHA);
+    }
+
+    private TokenUsuario buscarTokenValido(String tokenEmTexto, String tipo) {
+        TokenUsuario token = tokenUsuarioRepository.findByTokenHash(hashToken(tokenEmTexto))
+                .orElseThrow(() -> tokenInvalido());
+        if (!tipo.equals(token.getTipo())
+                || Boolean.TRUE.equals(token.getUsado())
+                || token.getExpiraEm() == null
+                || !token.getExpiraEm().isAfter(Instant.now())) {
+            throw tokenInvalido();
+        }
+        return token;
+    }
+
+    private ResponseStatusException tokenInvalido() {
+        return new ResponseStatusException(
+                HttpStatus.BAD_REQUEST, "Link inválido ou expirado");
+    }
+
     @Transactional(readOnly = true)
     public AuthResponse autenticar(String email, String senha) {
         Usuario usuario = usuarioRepository.findByEmailIgnoreCase(normalizarEmail(email)).orElse(null);
-
-        // Sempre executa BCrypt, inclusive quando a conta não existe ou ainda não foi confirmada.
         String hashArmazenado = usuario != null ? usuario.getSenhaHash() : HASH_SENHA_DUMMY;
         boolean senhaValida = passwordEncoder.matches(senha, hashArmazenado);
 
-        if (usuario == null
-                || !senhaValida) {
+        if (usuario == null || !senhaValida) {
             throw new BadCredentialsException("E-mail ou senha inválidos");
+        }
+        if (!Boolean.TRUE.equals(usuario.getEmailConfirmado())) {
+            throw new ResponseStatusException(
+                    HttpStatus.FORBIDDEN, "Confirme seu e-mail antes de entrar");
         }
 
         Instant agora = Instant.now();
         Instant expiracao = agora.plusSeconds(expiracaoMinutos * 60);
-
         JwtClaimsSet claims = JwtClaimsSet.builder()
                 .issuer("gencand-api")
                 .issuedAt(agora)
@@ -142,31 +179,43 @@ public class AuthService {
 
         String token = jwtEncoder.encode(JwtEncoderParameters.from(
                 JwsHeader.with(MacAlgorithm.HS256).build(), claims)).getTokenValue();
-
         return new AuthResponse(token, "Bearer", expiracaoMinutos * 60);
     }
 
-    private void criarTokenEAgendarEmail(Usuario usuario) {
+    private void criarTokenEAgendarEmail(Usuario usuario, String tipo) {
         String tokenEmTexto = gerarToken();
-        invalidarTokensAnteriores(usuario);
+        invalidarTokensAnteriores(usuario, tipo);
 
         TokenUsuario token = new TokenUsuario();
         token.setUsuario(usuario);
-        token.setTipo(TIPO_CONFIRMACAO_EMAIL);
+        token.setTipo(tipo);
         token.setTokenHash(hashToken(tokenEmTexto));
         token.setCriadoEm(Instant.now());
         token.setExpiraEm(Instant.now().plus(Duration.ofHours(24)));
         token.setUsado(false);
         tokenUsuarioRepository.save(token);
-
-        // O listener envia somente depois do commit, em outra thread.
         eventPublisher.publishEvent(new EmailConfirmacaoSolicitadoEvent(
                 usuario.getEmail(), tokenEmTexto));
     }
 
-    private void invalidarTokensAnteriores(Usuario usuario) {
+    private void criarTokenEAgendarRecuperacao(Usuario usuario) {
+        String tokenEmTexto = gerarToken();
+        invalidarTokensAnteriores(usuario, TIPO_RECUPERACAO_SENHA);
+        TokenUsuario token = new TokenUsuario();
+        token.setUsuario(usuario);
+        token.setTipo(TIPO_RECUPERACAO_SENHA);
+        token.setTokenHash(hashToken(tokenEmTexto));
+        token.setCriadoEm(Instant.now());
+        token.setExpiraEm(Instant.now().plus(Duration.ofHours(1)));
+        token.setUsado(false);
+        tokenUsuarioRepository.save(token);
+        eventPublisher.publishEvent(new EmailRecuperacaoSenhaSolicitadoEvent(
+                usuario.getEmail(), tokenEmTexto));
+    }
+
+    private void invalidarTokensAnteriores(Usuario usuario, String tipo) {
         var anteriores = tokenUsuarioRepository.findByUsuarioIdAndTipoAndUsadoFalse(
-                usuario.getId(), TIPO_CONFIRMACAO_EMAIL);
+                usuario.getId(), tipo);
         anteriores.forEach(token -> token.setUsado(true));
         tokenUsuarioRepository.saveAll(anteriores);
     }

@@ -14,7 +14,6 @@ public record LoginRequest(
         String email,
 
         @NotBlank(message = "A senha é obrigatória")
-        @Size(max = 50, message = "A senha deve ter no máximo 50 caracteres")
         String senha
 
 ) {

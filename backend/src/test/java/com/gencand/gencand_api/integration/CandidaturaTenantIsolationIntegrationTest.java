@@ -211,7 +211,7 @@ class CandidaturaTenantIsolationIntegrationTest {
                                   "senha": "senha-segura"
                                 }
                                 """))
-                .andExpect(status().isUnauthorized());
+                .andExpect(status().isForbidden());
     }
 
     private Usuario criarUsuario(String email) {

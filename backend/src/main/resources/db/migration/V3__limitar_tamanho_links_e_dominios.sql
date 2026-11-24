@@ -1,6 +1,7 @@
--- Limita os endereços armazenados, mantendo a validação também na API.
-alter table candidatura
-    alter column link type varchar(255);
+-- Mantém URLs como TEXT para preservar links longos de vagas e parâmetros de rastreamento.
+-- O tamanho é validado na API; não há conversão destrutiva de dados existentes.
+ALTER TABLE candidatura
+    ALTER COLUMN link TYPE text;
 
-alter table plataforma
-    alter column dominio type varchar(255);
+ALTER TABLE plataforma
+    ALTER COLUMN dominio TYPE text;

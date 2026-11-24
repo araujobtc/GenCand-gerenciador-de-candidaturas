@@ -4,6 +4,8 @@ import com.gencand.gencand_api.dto.request.ConfirmacaoEmailRequest;
 import com.gencand.gencand_api.dto.request.LoginRequest;
 import com.gencand.gencand_api.dto.request.RegistroRequest;
 import com.gencand.gencand_api.dto.request.ReenvioConfirmacaoRequest;
+import com.gencand.gencand_api.dto.request.SolicitacaoRecuperacaoSenhaRequest;
+import com.gencand.gencand_api.dto.request.RedefinicaoSenhaRequest;
 import com.gencand.gencand_api.dto.response.AuthResponse;
 import com.gencand.gencand_api.service.AuthService;
 import jakarta.validation.Valid;
@@ -23,17 +25,11 @@ public class AuthController {
     @PostMapping("/register")
     public ResponseEntity<Map<String, String>> registrar(
             @Valid @RequestBody RegistroRequest request) {
-        AuthService.ResultadoRegistro resultado =
-                authService.registrar(request.email(), request.senha());
-
-        String mensagem = switch (resultado) {
-            case CRIADO ->
-                    "Cadastro realizado com sucesso! Você já pode fazer login.";
-            case JA_CADASTRADO ->
-                    "Já existe uma conta cadastrada com este e-mail. Faça login para acessar sua conta.";
-        };
-
-        return ResponseEntity.accepted().body(Map.of("mensagem", mensagem));
+        authService.registrar(request.email(), request.senha());
+        return ResponseEntity.accepted().body(Map.of(
+                "mensagem",
+                "Se o endereço puder ser cadastrado, enviaremos um link de confirmação. Verifique sua caixa de entrada."
+        ));
     }
 
     @PostMapping("/resend-confirmation")
@@ -51,6 +47,23 @@ public class AuthController {
             @Valid @RequestBody ConfirmacaoEmailRequest request) {
         authService.confirmarEmail(request.token());
         return ResponseEntity.ok(Map.of("mensagem", "E-mail confirmado com sucesso."));
+    }
+
+    @PostMapping("/forgot-password")
+    public ResponseEntity<Map<String, String>> solicitarRecuperacao(
+            @Valid @RequestBody SolicitacaoRecuperacaoSenhaRequest request) {
+        authService.solicitarRecuperacaoSenha(request.email());
+        return ResponseEntity.accepted().body(Map.of(
+                "mensagem",
+                "Se existir uma conta associada a esse endereço, enviaremos instruções para redefinir a senha."
+        ));
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<Map<String, String>> redefinirSenha(
+            @Valid @RequestBody RedefinicaoSenhaRequest request) {
+        authService.redefinirSenha(request.token(), request.novaSenha());
+        return ResponseEntity.ok(Map.of("mensagem", "Senha redefinida com sucesso. Você já pode entrar."));
     }
 
     @PostMapping("/login")

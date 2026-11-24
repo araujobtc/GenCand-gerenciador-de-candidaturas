@@ -9,7 +9,7 @@ import java.nio.charset.StandardCharsets;
 
 public record RegistroRequest(
         @NotBlank @Email @Size(max = 254) String email,
-        @NotBlank @Size(min = 8, max = 50) String senha
+        @NotBlank @Size(min = 8, max = 72) String senha
 ) {
     @AssertTrue(message = "A senha não pode ultrapassar 72 bytes em UTF-8")
     public boolean isSenhaDentroDoLimiteBCrypt() {

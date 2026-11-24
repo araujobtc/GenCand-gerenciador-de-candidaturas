@@ -54,20 +54,20 @@ class ValidacaoSenhaRequestTest {
     }
 
     @Test
-    void loginRejeitaSenhaComMaisDe50Caracteres() {
+    void loginAceitaSenhaLegadaComMaisDe50Ate72CaracteresAscii() {
         LoginRequest request = new LoginRequest(
                 "teste@exemplo.com",
-                "a".repeat(51));
+                "a".repeat(72));
 
-        assertFalse(validator.validate(request).isEmpty());
+        assertTrue(validator.validate(request).isEmpty());
     }
 
     @Test
-    void loginAceitaSenhaCom50CaracteresAscii() {
+    void loginRejeitaSenhaComMaisDe72BytesAscii() {
         LoginRequest request = new LoginRequest(
                 "teste@exemplo.com",
-                "a".repeat(50));
+                "a".repeat(73));
 
-        assertTrue(validator.validate(request).isEmpty());
+        assertFalse(validator.validate(request).isEmpty());
     }
 }

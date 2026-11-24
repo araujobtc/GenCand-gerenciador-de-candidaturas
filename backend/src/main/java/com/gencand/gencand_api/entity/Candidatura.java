@@ -37,7 +37,7 @@ public class Candidatura {
     @Column(name = "empresa", nullable = false)
     private String empresa;
 
-    @Column(name = "link", length = 255)
+    @Column(name = "link")
     private String link;
 
     @Column(name = "data_candidatura", nullable = false)

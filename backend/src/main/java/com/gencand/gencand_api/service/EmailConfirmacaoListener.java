@@ -13,18 +13,25 @@ import org.springframework.transaction.event.TransactionalEventListener;
 public class EmailConfirmacaoListener {
 
     private static final Logger log = LoggerFactory.getLogger(EmailConfirmacaoListener.class);
-
     private final BrevoEmailService brevoEmailService;
 
     @Async
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void enviar(EmailConfirmacaoSolicitadoEvent evento) {
         try {
-            brevoEmailService.enviarConfirmacaoEmail(
-                    evento.destinatario(), evento.token());
+            brevoEmailService.enviarConfirmacaoEmail(evento.destinatario(), evento.token());
         } catch (RuntimeException exception) {
-            // Não registrar destinatário, token, conteúdo da resposta ou dados do provedor.
             log.error("Falha ao enviar e-mail de confirmação. Verifique a configuração do Brevo e os logs do provedor.");
+        }
+    }
+
+    @Async
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+    public void enviarRecuperacao(EmailRecuperacaoSenhaSolicitadoEvent evento) {
+        try {
+            brevoEmailService.enviarRecuperacaoSenha(evento.destinatario(), evento.token());
+        } catch (RuntimeException exception) {
+            log.error("Falha ao enviar e-mail de recuperação de senha. Verifique a configuração do Brevo e os logs do provedor.");
         }
     }
 }

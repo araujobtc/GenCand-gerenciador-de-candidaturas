@@ -3,6 +3,7 @@ package com.gencand.gencand_api.util;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.net.IDN;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Locale;
@@ -13,36 +14,53 @@ public final class ValidacaoUrl {
     }
 
     public static String validarLink(String valor) {
-        if (valor == null || valor.isBlank()) {
-            return null;
-        }
+        if (valor == null || valor.isBlank()) return null;
         return validarEndereco(valor.trim(), false);
     }
 
     public static String validarDominio(String valor) {
-        if (valor == null || valor.isBlank()) {
-            return null;
-        }
+        if (valor == null || valor.isBlank()) return null;
         return validarEndereco(valor.trim(), true);
     }
 
     private static String validarEndereco(String valor, boolean aceitarDominioSemEsquema) {
         try {
-            URI uri = new URI(valor);
-            if (uri.getScheme() == null && aceitarDominioSemEsquema) {
-                uri = new URI("https://" + valor);
+            String candidato = valor;
+            if (aceitarDominioSemEsquema && !valor.contains("://")) {
+                // Prefixa antes do parse para que host:porta não seja confundido com esquema.
+                candidato = "https://" + valor;
             }
 
+            URI uri = new URI(candidato);
             String esquema = uri.getScheme();
             boolean esquemaPermitido = esquema != null
-                    && (esquema.toLowerCase(Locale.ROOT).equals("http")
-                    || esquema.toLowerCase(Locale.ROOT).equals("https"));
+                    && (esquema.equalsIgnoreCase("http") || esquema.equalsIgnoreCase("https"));
 
             if (!esquemaPermitido || uri.getHost() == null || uri.getUserInfo() != null) {
-                throw new URISyntaxException(valor, "URL deve usar http ou https e possuir um host válido");
+                throw new URISyntaxException(valor, "Esquema ou host inválido");
             }
 
-            return valor;
+            String host = uri.getHost();
+            if (host.indexOf('_') >= 0) {
+                throw new URISyntaxException(valor, "Host não pode conter underscore");
+            }
+            if (!host.startsWith("[") && !host.contains(":")) {
+                host = IDN.toASCII(host).toLowerCase(Locale.ROOT);
+            } else {
+                host = host.toLowerCase(Locale.ROOT);
+            }
+
+            URI normalizada = new URI(
+                    esquema.toLowerCase(Locale.ROOT),
+                    null,
+                    host,
+                    uri.getPort(),
+                    uri.getPath(),
+                    uri.getQuery(),
+                    uri.getFragment()
+            ).normalize();
+
+            return normalizada.toASCIIString();
         } catch (URISyntaxException | IllegalArgumentException e) {
             throw new ResponseStatusException(
                     HttpStatus.BAD_REQUEST,

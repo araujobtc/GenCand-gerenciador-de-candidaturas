@@ -54,25 +54,37 @@ public class BrevoEmailService {
                 .build();
     }
 
+    public void enviarRecuperacaoSenha(String destinatario, String token) {
+        enviarEmail(destinatario, token, "Recuperação de senha do GenCand",
+                "/redefinir-senha?token=", "Redefinir minha senha",
+                "Este link expira em uma hora. Se você não solicitou a recuperação, ignore esta mensagem.");
+    }
+
     public void enviarConfirmacaoEmail(String destinatario, String token) {
+        enviarEmail(destinatario, token, ASSUNTO_CONFIRMACAO,
+                "/confirmar-email?token=", "Confirmar meu e-mail",
+                "Este link expira em 24 horas. Se você não criou uma conta, ignore esta mensagem.");
+    }
+
+    private void enviarEmail(String destinatario, String token, String assunto,
+                             String caminho, String textoLink, String aviso) {
         if (apiKey.isBlank() || remetenteEmail.isBlank()) {
             throw new IllegalStateException(
-                    "Configure BREVO_API_KEY e BREVO_REMETENTE_EMAIL para enviar a confirmação de e-mail");
+                    "Configure BREVO_API_KEY e BREVO_REMETENTE_EMAIL para enviar e-mails transacionais");
         }
 
-        String link = frontendUrl.replaceAll("/+$", "")
-                + "/confirmar-email?token=" + token;
+        String link = frontendUrl.replaceAll("/+$", "") + caminho + token;
 
         Map<String, Object> corpo = Map.of(
                 "sender", Map.of("name", remetenteNome, "email", remetenteEmail),
                 "to", List.of(Map.of("email", destinatario)),
-                "subject", ASSUNTO_CONFIRMACAO,
+                "subject", assunto,
                 "htmlContent", """
                         <p>Olá!</p>
-                        <p>Para confirmar seu endereço de e-mail no GenCand, acesse o link abaixo:</p>
-                        <p><a href="%s">Confirmar meu e-mail</a></p>
-                        <p>Este link expira em 24 horas. Se você não criou uma conta, ignore esta mensagem.</p>
-                        """.formatted(link)
+                        <p>Acesse o link abaixo:</p>
+                        <p><a href="%s">%s</a></p>
+                        <p>%s</p>
+                        """.formatted(link, textoLink, aviso)
         );
 
         restClient.post()
@@ -84,6 +96,6 @@ public class BrevoEmailService {
                 .toBodilessEntity();
 
         // Log intencionalmente limitado ao assunto e remetente.
-        log.info("E-mail enviado. Assunto: {}; Remetente: {}", ASSUNTO_CONFIRMACAO, remetenteEmail);
+        log.info("E-mail enviado. Assunto: {}; Remetente: {}", assunto, remetenteEmail);
     }
 }
