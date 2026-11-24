@@ -171,6 +171,28 @@ class AuthServiceTest {
         verify(eventPublisher, never()).publishEvent(any(Object.class));
     }
 
+    @Test
+    void solicitacaoRecuperacaoCriaTokenComValidadeDeQuinzeMinutos() {
+        Usuario titular = usuario("titular@exemplo.com", true);
+        when(usuarioRepository.findByEmailIgnoreCase("titular@exemplo.com"))
+                .thenReturn(Optional.of(titular));
+        when(tokenUsuarioRepository.countByUsuarioIdAndTipoAndCriadoEmAfter(
+                eq(titular.getId()), eq("RECUPERAR_SENHA"), any())).thenReturn(0L);
+        when(tokenUsuarioRepository.findByUsuarioIdAndTipoAndUsadoFalse(
+                titular.getId(), "RECUPERAR_SENHA")).thenReturn(List.of());
+
+        Instant inicio = Instant.now();
+        authService.solicitarRecuperacaoSenha("titular@exemplo.com");
+
+        ArgumentCaptor<TokenUsuario> captor = ArgumentCaptor.forClass(TokenUsuario.class);
+        verify(tokenUsuarioRepository).save(captor.capture());
+        Instant expiraEm = captor.getValue().getExpiraEm();
+        assertNotNull(expiraEm);
+        assertFalse(expiraEm.isBefore(inicio.plusSeconds(15 * 60 - 2)));
+        assertFalse(expiraEm.isAfter(Instant.now().plusSeconds(15 * 60 + 2)));
+        verify(eventPublisher).publishEvent(any(EmailRecuperacaoSenhaSolicitadoEvent.class));
+    }
+
     private String hash(String token) throws NoSuchAlgorithmException {
         byte[] bytes = MessageDigest.getInstance("SHA-256")
                 .digest(token.getBytes(StandardCharsets.UTF_8));

@@ -206,7 +206,7 @@ public class AuthService {
         token.setTipo(TIPO_RECUPERACAO_SENHA);
         token.setTokenHash(hashToken(tokenEmTexto));
         token.setCriadoEm(Instant.now());
-        token.setExpiraEm(Instant.now().plus(Duration.ofHours(1)));
+        token.setExpiraEm(Instant.now().plus(Duration.ofMinutes(15)));
         token.setUsado(false);
         tokenUsuarioRepository.save(token);
         eventPublisher.publishEvent(new EmailRecuperacaoSenhaSolicitadoEvent(
