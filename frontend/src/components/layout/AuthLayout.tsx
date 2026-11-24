@@ -9,7 +9,7 @@ export default function AuthLayout({ children, variant = 'login' }: AuthLayoutPr
     <main className={styles.page} data-variant={variant}>
       <section className={styles.brandPanel} aria-label="Organizador de candidaturas">
         <Link className={styles.brand} to="/login" aria-label="Organizador de candidaturas">
-          <img className={styles.brandLogo} src="/logo-gencand.svg" alt="GenCand — Organizador de candidaturas" />
+          <img className={styles.brandLogo} src="/logo-gencand-branco.svg" alt="GenCand — Organizador de candidaturas" />
         </Link>
         <div className={styles.pitch}>
           <p className={styles.pitchTitle}>Acompanhe cada<br />candidatura em um<br />só lugar.</p>

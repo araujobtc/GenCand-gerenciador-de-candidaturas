@@ -62,7 +62,6 @@
   width: 320px;
   max-width: 100%;
   height: auto;
-  filter: brightness(0) invert(1);
 }
 
 .brand:focus-visible {
