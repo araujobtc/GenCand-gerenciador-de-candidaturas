@@ -5,21 +5,24 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
-
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 public interface CandidaturaRepository extends JpaRepository<Candidatura, UUID> {
-
-    // Carrega a plataforma junto com a página para evitar consultas N+1.
     @EntityGraph(attributePaths = "plataforma")
     Page<Candidatura> findByUsuarioIdAndOculta(UUID usuarioId, boolean oculta, Pageable pageable);
-
-    // Toda busca por id leva o dono junto: e isso que impede ver dados de outra pessoa.
     Optional<Candidatura> findByIdAndUsuarioId(UUID id, UUID usuarioId);
-
     boolean existsByIdAndUsuarioId(UUID id, UUID usuarioId);
-
-    // Quantas candidaturas estao ligadas a uma plataforma (tela de Plataformas).
     long countByPlataformaId(UUID plataformaId);
+
+    @Query("select coalesce(c.status, 'SEM_STATUS'), count(c) from Candidatura c " +
+           "where c.usuario.id = :usuarioId and c.oculta = false " +
+           "and c.dataCandidatura between :inicio and :fim group by c.status")
+    List<Object[]> resumirPorStatus(@Param("usuarioId") UUID usuarioId,
+                                    @Param("inicio") LocalDate inicio,
+                                    @Param("fim") LocalDate fim);
 }

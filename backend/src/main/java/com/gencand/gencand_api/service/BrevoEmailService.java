@@ -98,4 +98,20 @@ public class BrevoEmailService {
         // Log intencionalmente limitado ao assunto e remetente.
         log.info("E-mail enviado. Assunto: {}; Remetente: {}", assunto, remetenteEmail);
     }
+
+    public void enviarResumoAlertas(String destinatario, String html) {
+        if (apiKey.isBlank() || remetenteEmail.isBlank()) {
+            log.warn("Resumo de alertas não enviado: serviço de e-mail não configurado.");
+            return;
+        }
+        Map<String, Object> corpo = Map.of(
+                "sender", Map.of("name", remetenteNome, "email", remetenteEmail),
+                "to", List.of(Map.of("email", destinatario)),
+                "subject", "Seu resumo de candidaturas — GenCand",
+                "htmlContent", html
+        );
+        restClient.post().uri(url).header("api-key", apiKey)
+                .contentType(MediaType.APPLICATION_JSON).body(corpo).retrieve().toBodilessEntity();
+        log.info("Resumo de alertas enviado.");
+    }
 }
