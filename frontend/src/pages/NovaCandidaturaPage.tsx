@@ -1,6 +1,8 @@
 import { useState, type FormEvent } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { candidaturaService } from '../api/services/candidaturaService'
+import { useEffect } from 'react'
+import { plataformaService, type Plataforma } from '../api/services/workspaceService'
 import MainLayout from '../components/layout/MainLayout'
 import styles from './ApplicationPages.module.css'
 import { aplicarMascaraData, converterDataParaISO } from '../utils/date'
@@ -20,6 +22,9 @@ function NovaCandidaturaPage() {
   const [link, setLink] = useState('')
   const [dataCandidatura, setDataCandidatura] = useState(dataLocalHoje)
   const [observacao, setObservacao] = useState('')
+  const [plataformas, setPlataformas] = useState<Plataforma[]>([])
+  const [plataformaId, setPlataformaId] = useState('')
+  useEffect(() => { plataformaService.listar().then(setPlataformas).catch(() => setPlataformas([])) }, [])
   const [erro, setErro] = useState('')
   const [carregando, setCarregando] = useState(false)
 
@@ -34,6 +39,7 @@ function NovaCandidaturaPage() {
         link: link || null,
         dataCandidatura: converterDataParaISO(dataCandidatura),
         observacao: observacao || null,
+        plataformaId: plataformaId || null,
       })
       navigate('/candidaturas')
     } catch (error) {
@@ -62,6 +68,10 @@ function NovaCandidaturaPage() {
             <input id="empresa" value={empresa} onChange={event => setEmpresa(event.target.value)} required maxLength={255} />
           </div>
           <div className={styles.formField}>
+            <label htmlFor="plataforma">Plataforma</label>
+            <select id="plataforma" value={plataformaId} onChange={event => setPlataformaId(event.target.value)}><option value="">Não informada</option>{plataformas.filter(p => !p.oculta).map(p => <option key={p.id} value={p.id}>{p.nome}</option>)}</select>
+          </div>
+          <div className={styles.formField}>
             <label htmlFor="data">Data da candidatura</label>
             <input id="data" type="text" inputMode="numeric" placeholder="dd/MM/aaaa" value={dataCandidatura} onChange={event => setDataCandidatura(aplicarMascaraData(event.target.value))} maxLength={10} />
           </div>
@@ -70,7 +80,7 @@ function NovaCandidaturaPage() {
             <textarea id="observacao" placeholder="Anote o que for útil: regime de trabalho, requisitos, quem indicou..." value={observacao} onChange={event => setObservacao(event.target.value)} maxLength={5000} />
           </div>
         </div>
-        <p className={styles.hint}>O vínculo com uma plataforma ainda não está disponível nesta versão.</p>
+
         {erro && <p role="alert" className={styles.actionMessage}>{erro}</p>}
         <div className={styles.actions}>
           <Link className={styles.secondary} to="/candidaturas">Cancelar</Link>

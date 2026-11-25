@@ -1,6 +1,7 @@
 import { useEffect, useState, type FormEvent } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { candidaturaService } from '../api/services/candidaturaService'
+import { plataformaService, type Plataforma } from '../api/services/workspaceService'
 import MainLayout from '../components/layout/MainLayout'
 import styles from './ApplicationPages.module.css'
 import { aplicarMascaraData, converterDataParaISO, formatarData } from '../utils/date'
@@ -13,6 +14,8 @@ function EditarCandidaturaPage() {
   const [link, setLink] = useState('')
   const [dataCandidatura, setDataCandidatura] = useState('')
   const [observacao, setObservacao] = useState('')
+  const [plataformas, setPlataformas] = useState<Plataforma[]>([])
+  const [plataformaId, setPlataformaId] = useState('')
   const [erro, setErro] = useState('')
   const [carregando, setCarregando] = useState(true)
   const [salvando, setSalvando] = useState(false)
@@ -28,13 +31,15 @@ function EditarCandidaturaPage() {
       }
 
       try {
-        const candidatura = await candidaturaService.buscarPorId(id)
+        const [candidatura, listaPlataformas] = await Promise.all([candidaturaService.buscarPorId(id), plataformaService.listar()])
+        if (ativo) setPlataformas(listaPlataformas)
         if (!ativo) return
         setTitulo(candidatura.titulo)
         setEmpresa(candidatura.empresa)
         setLink(candidatura.link ?? '')
         setDataCandidatura(candidatura.dataCandidatura ? formatarData(candidatura.dataCandidatura) : '')
         setObservacao(candidatura.observacao ?? '')
+        setPlataformaId(candidatura.plataformaId ?? '')
       } catch (error) {
         if (ativo) setErro(error instanceof Error ? error.message : 'Não foi possível carregar a candidatura.')
       } finally {
@@ -58,6 +63,7 @@ function EditarCandidaturaPage() {
         link: link || null,
         dataCandidatura: converterDataParaISO(dataCandidatura),
         observacao: observacao || null,
+        plataformaId: plataformaId || null,
       })
       navigate('/candidaturas')
     } catch (error) {
@@ -90,6 +96,10 @@ function EditarCandidaturaPage() {
               <input id="empresa" value={empresa} onChange={event => setEmpresa(event.target.value)} required maxLength={255} />
             </div>
             <div className={styles.formField}>
+              <label htmlFor="plataforma">Plataforma</label>
+              <select id="plataforma" value={plataformaId} onChange={event => setPlataformaId(event.target.value)}><option value="">Não informada</option>{plataformas.filter(p => !p.oculta).map(p => <option key={p.id} value={p.id}>{p.nome}</option>)}</select>
+            </div>
+            <div className={styles.formField}>
               <label htmlFor="data">Data da candidatura</label>
               <input id="data" type="text" inputMode="numeric" placeholder="dd/MM/aaaa" value={dataCandidatura} onChange={event => setDataCandidatura(aplicarMascaraData(event.target.value))} maxLength={10} />
             </div>
@@ -98,7 +108,7 @@ function EditarCandidaturaPage() {
               <textarea id="observacao" value={observacao} onChange={event => setObservacao(event.target.value)} maxLength={5000} />
             </div>
           </div>
-          <p className={styles.hint}>A plataforma não pode ser alterada nesta versão.</p>
+
           {erro && <p role="alert" className={styles.actionMessage}>{erro}</p>}
           <div className={styles.actions}>
             <Link className={styles.secondary} to="/candidaturas">Cancelar</Link>

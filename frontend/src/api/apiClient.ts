@@ -8,6 +8,17 @@ export class ApiError extends Error {
 
 type ApiRequestOptions = { method?: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE'; body?: unknown; authenticated?: boolean }
 
+function headersAutenticacao(authenticated: boolean, accept = 'application/json'): Headers {
+  const headers = new Headers({ Accept: accept })
+  if (authenticated && typeof sessionStorage !== 'undefined') {
+    const token = sessionStorage.getItem(CHAVE_TOKEN)
+    if (token) headers.set('Authorization', 'Bearer ' + token)
+  }
+  return headers
+}
+function tratarNaoAutorizado(status: number, authenticated: boolean) {
+  if (status === 401 && authenticated) { removerToken(); window.dispatchEvent(new Event('gencand:unauthorized')) }
+}
 function extrairMensagemErro(corpo: unknown): string | undefined {
   if (typeof corpo === 'string' && corpo.trim()) return corpo
   if (typeof corpo !== 'object' || corpo === null) return undefined
@@ -31,29 +42,40 @@ function extrairMensagemErro(corpo: unknown): string | undefined {
   }
   return undefined
 }
-
+async function lerErro(response: Response): Promise<ApiError> {
+  const raw=await response.text(); let body:unknown=raw
+  if(raw){try{body=JSON.parse(raw)}catch{/* resposta textual */}}
+  return new ApiError(extrairMensagemErro(body) ?? 'Não foi possível concluir a solicitação. Tente novamente.',response.status)
+}
 export async function apiRequest<T>(path: string, options: ApiRequestOptions = {}): Promise<T> {
   if (!API_URL) throw new ApiError('O endereço da API não foi configurado. Verifique as configurações do aplicativo.', 0)
   const { method = 'GET', body, authenticated = true } = options
-  const headers = new Headers({ Accept: 'application/json' })
+  const headers = headersAutenticacao(authenticated)
   if (body !== undefined) headers.set('Content-Type', 'application/json')
-  if (authenticated && typeof sessionStorage !== 'undefined') {
-    const token = sessionStorage.getItem(CHAVE_TOKEN)
-    if (token) headers.set('Authorization', 'Bearer ' + token)
-  }
   let response: Response
   try { response = await fetch(API_URL + '/api' + path, { method, headers, body: body === undefined ? undefined : JSON.stringify(body) }) }
   catch { throw new ApiError('Não foi possível conectar ao servidor. Verifique sua conexão com a internet e tente novamente.', 0) }
   if (response.status === 204) return undefined as T
-  const responseText = await response.text()
-  let responseBody: unknown
-  if (responseText) { try { responseBody = JSON.parse(responseText) } catch { responseBody = responseText } }
-  if (!response.ok) {
-    if (response.status === 401 && authenticated) { removerToken(); window.dispatchEvent(new Event('gencand:unauthorized')) }
-    throw new ApiError(extrairMensagemErro(responseBody) ?? 'Não foi possível concluir a solicitação. Tente novamente.', response.status)
-  }
-  return responseBody as T
+  if (!response.ok) { tratarNaoAutorizado(response.status,authenticated); throw await lerErro(response) }
+  const raw=await response.text()
+  if(!raw)return undefined as T
+  try{return JSON.parse(raw) as T}catch{return raw as T}
 }
-
+export async function apiUpload<T>(path:string,body:FormData,authenticated=true):Promise<T>{
+  if(!API_URL)throw new ApiError('O endereço da API não foi configurado.',0)
+  let response:Response
+  try{response=await fetch(API_URL+'/api'+path,{method:'POST',headers:headersAutenticacao(authenticated),body})}
+  catch{throw new ApiError('Não foi possível conectar ao servidor.',0)}
+  if(!response.ok){tratarNaoAutorizado(response.status,authenticated);throw await lerErro(response)}
+  return await response.json() as T
+}
+export async function apiDownload(path:string,authenticated=true):Promise<Blob>{
+  if(!API_URL)throw new ApiError('O endereço da API não foi configurado.',0)
+  let response:Response
+  try{response=await fetch(API_URL+'/api'+path,{headers:headersAutenticacao(authenticated,'application/pdf')})}
+  catch{throw new ApiError('Não foi possível conectar ao servidor.',0)}
+  if(!response.ok){tratarNaoAutorizado(response.status,authenticated);throw await lerErro(response)}
+  return response.blob()
+}
 export function salvarToken(token: string): void { sessionStorage.setItem(CHAVE_TOKEN, token) }
 export function removerToken(): void { sessionStorage.removeItem(CHAVE_TOKEN) }
