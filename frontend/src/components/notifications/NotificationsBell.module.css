@@ -1,0 +1,29 @@
+.wrap { position: relative; }
+.bell { position: relative; width: 40px; height: 40px; border-radius: 10px; border: 1px solid var(--border); background: var(--card); color: var(--text); display: grid; place-items: center; cursor: pointer; }
+.bell:hover { background: var(--gray-soft); }
+.dot { position: absolute; top: 7px; right: 8px; width: 9px; height: 9px; border-radius: 50%; background: var(--coral); border: 2px solid var(--card); }
+.panel { position: absolute; right: 0; top: calc(100% + 8px); z-index: 80; width: 400px; max-height: min(560px, calc(100dvh - 90px)); display: flex; flex-direction: column; background: var(--card); border: 1px solid var(--border); border-radius: 14px; box-shadow: var(--shadow); overflow: hidden; }
+.head { display: flex; align-items: center; gap: 8px; padding: 16px 18px 4px; }
+.head h2 { margin: 0; font: 600 16px Poppins, Arial, sans-serif; }
+.backBtn { display: none; border: 0; background: none; color: var(--text); width: 36px; height: 36px; margin-left: -8px; place-items: center; cursor: pointer; border-radius: 10px; }
+.sub { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 4px 18px 10px; color: var(--muted); font-size: 12px; }
+.link { border: 0; background: none; color: var(--blue); font: 600 12px Inter, Arial, sans-serif; cursor: pointer; padding: 4px 0; }
+.link:disabled { color: var(--muted); cursor: default; }
+.empty { margin: 0; padding: 28px 24px 32px; color: var(--muted); font-size: 14px; text-align: center; }
+.list { list-style: none; margin: 0; padding: 0 10px 10px; overflow-y: auto; display: grid; gap: 6px; }
+.item { width: 100%; display: flex; align-items: flex-start; gap: 12px; padding: 12px; border-radius: 10px; border: 1px solid var(--border); background: var(--card); color: var(--text); text-align: left; cursor: pointer; font: inherit; }
+.item:hover { background: var(--gray-soft); }
+.icon { width: 34px; height: 34px; flex: none; border-radius: 9px; display: grid; place-items: center; }
+.warn { background: var(--amber-soft); color: var(--amber-ink); }
+.info { background: var(--blue-soft); color: var(--blue-ink); }
+.text { flex: 1; min-width: 0; display: grid; gap: 2px; font-size: 13px; line-height: 1.4; }
+.text b { font-size: 14px; }
+.text span { color: var(--muted); }
+.text small { color: var(--muted); font-size: 12px; }
+.unread { width: 9px; height: 9px; margin-top: 6px; border-radius: 50%; background: var(--blue); flex: none; }
+
+@media (max-width: 800px) {
+  .panel { position: fixed; inset: 0; width: auto; max-height: none; border-radius: 0; border: 0; z-index: 90; }
+  .head { padding-top: calc(14px + env(safe-area-inset-top, 0px)); }
+  .backBtn { display: inline-grid; }
+}

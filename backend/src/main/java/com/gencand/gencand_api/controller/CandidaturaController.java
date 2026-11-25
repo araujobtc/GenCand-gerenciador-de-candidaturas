@@ -4,6 +4,7 @@ import com.gencand.gencand_api.dto.request.CandidaturaAtualizacaoRequest;
 import com.gencand.gencand_api.dto.request.CandidaturaRequest;
 import com.gencand.gencand_api.dto.request.CandidaturaStatusRequest;
 import com.gencand.gencand_api.dto.response.CandidaturaResponse;
+import com.gencand.gencand_api.dto.response.HistoricoStatusResponse;
 import com.gencand.gencand_api.security.UsuarioAtual;
 import com.gencand.gencand_api.service.CandidaturaService;
 import jakarta.validation.Valid;
@@ -18,6 +19,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -99,6 +101,29 @@ public class CandidaturaController {
             @UsuarioAtual UUID usuarioId) {
         return ResponseEntity.ok(candidaturaService.atualizarStatus(
                 id, request.status(), usuarioId));
+    }
+
+    // "Verifiquei hoje": atualiza só a data da última verificação, sem mudar o status.
+    @PatchMapping("/{id}/verificar")
+    public ResponseEntity<CandidaturaResponse> verificarHoje(
+            @PathVariable UUID id,
+            @UsuarioAtual UUID usuarioId) {
+        return ResponseEntity.ok(candidaturaService.verificarHoje(id, usuarioId));
+    }
+
+    @GetMapping("/{id}/historico")
+    public ResponseEntity<List<HistoricoStatusResponse>> historico(
+            @PathVariable UUID id,
+            @UsuarioAtual UUID usuarioId) {
+        return ResponseEntity.ok(candidaturaService.listarHistorico(id, usuarioId));
+    }
+
+    @PatchMapping("/{id}/ocultar")
+    public ResponseEntity<Void> ocultar(
+            @PathVariable UUID id,
+            @UsuarioAtual UUID usuarioId) {
+        candidaturaService.ocultar(id, usuarioId);
+        return ResponseEntity.noContent().build();
     }
 
     @DeleteMapping("/{id}")

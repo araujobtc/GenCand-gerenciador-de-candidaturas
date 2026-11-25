@@ -7,7 +7,11 @@ import RecuperarSenhaPage from '../pages/RecuperarSenhaPage'
 import CandidaturasPage from '../pages/CandidaturasPage'
 import NovaCandidaturaPage from '../pages/NovaCandidaturaPage'
 import EditarCandidaturaPage from '../pages/EditarCandidaturaPage'
-import { DashboardPage, PlataformasPage, CurriculosPage, ConfiguracoesPage, DetalhesCandidaturaPage } from '../pages/WorkspacePages'
+import PainelPage from '../pages/PainelPage'
+import PlataformasPage from '../pages/PlataformasPage'
+import CurriculosPage from '../pages/CurriculosPage'
+import ConfiguracoesPage from '../pages/ConfiguracoesPage'
+import DetalhesCandidaturaPage from '../pages/DetalhesCandidaturaPage'
 import RotaPrivada from './RotaPrivada'
 
 function RotaPublica({ children }: { children: React.ReactNode }) {
@@ -22,7 +26,7 @@ function AppRoutes() {
   <Route path="/recuperar-senha" element={<RotaPublica><RecuperarSenhaPage /></RotaPublica>} />
   <Route path="/redefinir-senha" element={<RotaPublica><RecuperarSenhaPage /></RotaPublica>} />
   <Route element={<RotaPrivada />}>
-   <Route path="/painel" element={<DashboardPage />} />
+   <Route path="/painel" element={<PainelPage />} />
    <Route path="/candidaturas" element={<CandidaturasPage />} />
    <Route path="/candidaturas/nova" element={<NovaCandidaturaPage />} />
    <Route path="/candidaturas/:id" element={<DetalhesCandidaturaPage />} />

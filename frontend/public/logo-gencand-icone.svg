@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" role="img" aria-label="GenCand">
+  <g transform="translate(14 14) scale(1.04)">
+    <path d="M 169 54 A 78 78 0 1 0 169 166" fill="none" stroke="#3157D5" stroke-width="26" stroke-linecap="butt"/>
+    <path d="M 73 106 L 111 145 L 186 70" fill="none" stroke="#159B91" stroke-width="23" stroke-linecap="butt" stroke-linejoin="miter"/>
+  </g>
+</svg>

@@ -48,3 +48,9 @@ export interface Pagina<T> {
   content: T[]
   page: PageMetadata
 }
+
+export interface HistoricoStatusItem {
+  statusAnterior: StatusCandidatura | null
+  statusNovo: StatusCandidatura
+  alteradoEm: string
+}

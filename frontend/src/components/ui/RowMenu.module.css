@@ -1,0 +1,7 @@
+.trigger { width: 36px; height: 36px; border-radius: 9px; border: 1px solid var(--border-strong); background: var(--card); color: var(--muted); display: inline-grid; place-items: center; cursor: pointer; padding: 0; }
+.trigger:hover { background: var(--gray-soft); color: var(--text); }
+.menu { position: fixed; z-index: 95; min-width: 200px; padding: 6px; background: var(--card); border: 1px solid var(--border); border-radius: 12px; box-shadow: var(--shadow); }
+.item { display: flex; align-items: center; gap: 12px; width: 100%; min-height: 40px; padding: 0 10px; border: 0; border-radius: 8px; background: none; color: var(--text); font: 500 14px Inter, Arial, sans-serif; text-decoration: none; text-align: left; cursor: pointer; }
+.item:hover { background: var(--gray-soft); }
+.item svg { color: var(--muted); }
+.danger, .danger svg { color: var(--danger); }

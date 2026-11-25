@@ -40,7 +40,7 @@ public class CurriculoService {
             c.setArquivo(bytes);
             c.setPrincipal(principal || repository.countByUsuarioId(usuarioId) == 0);
             if (c.getPrincipal()) repository.findByUsuarioIdAndPrincipalTrue(usuarioId).ifPresent(atual -> {
-                atual.setPrincipal(false); repository.save(atual);
+                atual.setPrincipal(false); repository.saveAndFlush(atual);
             });
             return response(repository.save(c));
         } catch (IOException e) {
@@ -58,7 +58,7 @@ public class CurriculoService {
     public void definirPrincipal(UUID id, UUID usuarioId) {
         Curriculo alvo = baixar(id, usuarioId);
         repository.findByUsuarioIdAndPrincipalTrue(usuarioId).ifPresent(atual -> {
-            atual.setPrincipal(false); repository.save(atual);
+            atual.setPrincipal(false); repository.saveAndFlush(atual);
         });
         alvo.setPrincipal(true);
         repository.save(alvo);
@@ -69,6 +69,7 @@ public class CurriculoService {
         Curriculo alvo = baixar(id, usuarioId);
         boolean eraPrincipal = Boolean.TRUE.equals(alvo.getPrincipal());
         repository.delete(alvo);
+        repository.flush();
         if (eraPrincipal) repository.findByUsuarioIdOrderByNomeAsc(usuarioId).stream().findFirst().ifPresent(outro -> {
             outro.setPrincipal(true); repository.save(outro);
         });

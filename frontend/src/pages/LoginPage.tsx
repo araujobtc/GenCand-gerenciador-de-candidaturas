@@ -2,6 +2,7 @@ import { useState, type FormEvent } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
 import AuthLayout from '../components/layout/AuthLayout'
+import PasswordInput from '../components/ui/PasswordInput'
 import styles from '../components/layout/AuthLayout.module.css'
 
 function LoginPage() {
@@ -37,7 +38,7 @@ function LoginPage() {
         </label>
         <label className={styles.field}>
           <span>Senha</span>
-          <input type="password" placeholder="••••••••••" value={senha} onChange={e => setSenha(e.target.value)} required autoComplete="current-password" />
+          <PasswordInput placeholder="••••••••••" value={senha} onChange={e => setSenha(e.target.value)} required autoComplete="current-password" />
         </label>
         <div className={styles.authLinks}>
           <Link className={styles.textLink} to="/recuperar-senha">Esqueci minha senha</Link>

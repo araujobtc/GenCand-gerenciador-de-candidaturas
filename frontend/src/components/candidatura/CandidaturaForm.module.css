@@ -1,0 +1,4 @@
+.form { display: grid; gap: 18px; }
+.recognized { display: inline-flex; align-items: center; gap: 6px; margin-top: 8px; padding: 5px 12px; border-radius: 999px; background: var(--teal-soft); color: var(--teal-ink); font-size: 12px; font-weight: 600; }
+.footer { display: flex; justify-content: flex-end; gap: 12px; padding-top: 4px; }
+@media (max-width: 720px) { .footer > * { flex: 1; } }

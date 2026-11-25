@@ -1,0 +1,8 @@
+.columns { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; }
+.group { margin: 0; padding: 0; border: 0; display: grid; gap: 6px; align-content: start; min-width: 0; }
+.group legend { padding: 0; margin-bottom: 8px; font: 600 13px Poppins, Arial, sans-serif; color: var(--muted); }
+.option { display: flex; align-items: center; gap: 10px; min-height: 40px; padding: 0 10px; border: 1px solid transparent; border-radius: 10px; cursor: pointer; }
+.option:hover { background: var(--gray-soft); }
+.option input { accent-color: var(--blue); width: 16px; height: 16px; margin: 0; }
+.selected { background: var(--blue-soft); border-color: var(--blue); }
+@media (max-width: 720px) { .columns { grid-template-columns: minmax(0, 1fr); gap: 12px; } }

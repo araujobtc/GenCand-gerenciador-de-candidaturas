@@ -8,12 +8,37 @@ export class ApiError extends Error {
 
 type ApiRequestOptions = { method?: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE'; body?: unknown; authenticated?: boolean }
 
+/**
+ * Lê o token compartilhado entre abas. Migra tokens de versões anteriores
+ * que ainda estejam no sessionStorage desta aba.
+ */
+export function lerToken(): string | null {
+  if (typeof window === 'undefined') return null
+
+  try {
+    const tokenCompartilhado = window.localStorage.getItem(CHAVE_TOKEN)
+    if (tokenCompartilhado) {
+      window.sessionStorage.removeItem(CHAVE_TOKEN)
+      return tokenCompartilhado
+    }
+
+    const tokenLegado = window.sessionStorage.getItem(CHAVE_TOKEN)
+    if (tokenLegado) {
+      window.localStorage.setItem(CHAVE_TOKEN, tokenLegado)
+      window.sessionStorage.removeItem(CHAVE_TOKEN)
+      return tokenLegado
+    }
+  } catch {
+    // O navegador pode bloquear o armazenamento; a aplicação permanece utilizável.
+  }
+
+  return null
+}
+
 function headersAutenticacao(authenticated: boolean, accept = 'application/json'): Headers {
   const headers = new Headers({ Accept: accept })
-  if (authenticated && typeof sessionStorage !== 'undefined') {
-    const token = sessionStorage.getItem(CHAVE_TOKEN)
-    if (token) headers.set('Authorization', 'Bearer ' + token)
-  }
+  const token = authenticated ? lerToken() : null
+  if (token) headers.set('Authorization', 'Bearer ' + token)
   return headers
 }
 function tratarNaoAutorizado(status: number, authenticated: boolean) {
@@ -77,5 +102,13 @@ export async function apiDownload(path:string,authenticated=true):Promise<Blob>{
   if(!response.ok){tratarNaoAutorizado(response.status,authenticated);throw await lerErro(response)}
   return response.blob()
 }
-export function salvarToken(token: string): void { sessionStorage.setItem(CHAVE_TOKEN, token) }
-export function removerToken(): void { sessionStorage.removeItem(CHAVE_TOKEN) }
+export function salvarToken(token: string): void {
+  if (typeof window === 'undefined') return
+  window.localStorage.setItem(CHAVE_TOKEN, token)
+  window.sessionStorage.removeItem(CHAVE_TOKEN)
+}
+export function removerToken(): void {
+  if (typeof window === 'undefined') return
+  window.localStorage.removeItem(CHAVE_TOKEN)
+  window.sessionStorage.removeItem(CHAVE_TOKEN)
+}

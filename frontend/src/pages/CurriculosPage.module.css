@@ -1,0 +1,23 @@
+.gap { margin-bottom: 16px; }
+.grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+.grid article { display: grid; gap: 14px; align-content: start; justify-items: start; }
+.cvHead { display: flex; align-items: center; gap: 14px; }
+.cvHead h2 { margin: 0; font: 600 16px Poppins, Arial, sans-serif; overflow-wrap: anywhere; }
+.cvHead p { margin: 2px 0 0; color: var(--muted); font-size: 13px; }
+.fileIcon { width: 44px; height: 44px; border-radius: 12px; background: var(--blue-soft); color: var(--blue); display: grid; place-items: center; flex: none; }
+.cvActions { display: flex; gap: 10px; width: 100%; padding-top: 12px; border-top: 1px solid var(--border); }
+.cvActions > :last-child { margin-left: auto; }
+.h2 { margin: 28px 0 12px; font: 600 16px Poppins, Arial, sans-serif; }
+.form { display: grid; gap: 14px; }
+.drop { display: grid; justify-items: center; gap: 6px; padding: 28px 20px; border: 2px dashed var(--border-strong); border-radius: 14px; background: var(--card); color: var(--muted); text-align: center; font-size: 13px; }
+.drop b { color: var(--text); font-size: 14px; overflow-wrap: anywhere; }
+.drop button { margin-top: 8px; }
+.dropOn { border-color: var(--blue); background: var(--blue-soft); }
+.dropOff { opacity: .75; }
+.meta { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; gap: 16px; align-items: end; }
+.check { display: flex; align-items: center; gap: 8px; min-height: 40px; font-size: 14px; }
+.check input { accent-color: var(--blue); width: 16px; height: 16px; }
+@media (max-width: 800px) {
+  .grid { grid-template-columns: minmax(0, 1fr); }
+  .meta { grid-template-columns: minmax(0, 1fr); }
+}

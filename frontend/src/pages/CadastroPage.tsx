@@ -2,6 +2,7 @@ import { useState, type FormEvent } from 'react'
 import { Link } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
 import AuthLayout from '../components/layout/AuthLayout'
+import PasswordInput from '../components/ui/PasswordInput'
 import styles from '../components/layout/AuthLayout.module.css'
 import confirmationStyles from './ConfirmarEmailPage.module.css'
 
@@ -62,15 +63,14 @@ function CadastroPage() {
         </label>
         <label className={styles.field}>
           <span>Senha</span>
-          <input type="password" placeholder="••••••••••" value={senha} onChange={e => setSenha(e.target.value)} required minLength={8} maxLength={72} autoComplete="new-password" />
+          <PasswordInput placeholder="••••••••••" value={senha} onChange={e => setSenha(e.target.value)} required minLength={8} maxLength={72} autoComplete="new-password" />
         </label>
         <p className={styles.fieldHint}>Mínimo de 8 caracteres.</p>
         <label className={styles.field}>
           <span>Confirmar senha</span>
-          <input type="password" placeholder="••••••••••" value={confirmarSenha} onChange={e => setConfirmarSenha(e.target.value)} required minLength={8} autoComplete="new-password" />
+          <PasswordInput placeholder="••••••••••" value={confirmarSenha} onChange={e => setConfirmarSenha(e.target.value)} required minLength={8} autoComplete="new-password" />
         </label>
         <p className={styles.fieldHint}>Enviaremos um link de confirmação para o endereço informado.</p>
-        {mensagem && <p className={styles.message} role="status">{mensagem}</p>}
         {erro && <p className={styles.error} role="alert">{erro}</p>}
         <button className={styles.primary} type="submit" disabled={carregando}>{carregando ? 'Enviando...' : 'Criar conta'}</button>
       </form>

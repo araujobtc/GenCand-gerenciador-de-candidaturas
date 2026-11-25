@@ -3,6 +3,7 @@ package com.gencand.gencand_api.service;
 import com.gencand.gencand_api.dto.request.CandidaturaAtualizacaoRequest;
 import com.gencand.gencand_api.dto.request.CandidaturaRequest;
 import com.gencand.gencand_api.dto.response.CandidaturaResponse;
+import com.gencand.gencand_api.dto.response.HistoricoStatusResponse;
 import com.gencand.gencand_api.entity.Candidatura;
 import com.gencand.gencand_api.entity.HistoricoStatus;
 import com.gencand.gencand_api.entity.Plataforma;
@@ -22,6 +23,7 @@ import org.springframework.web.server.ResponseStatusException;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -102,6 +104,15 @@ public class CandidaturaService {
         Candidatura candidatura = buscarEntidade(candidaturaId, usuarioId);
         candidatura.setDataAtualizacao(Instant.now());
         return paraResponse(candidaturaRepository.save(candidatura));
+    }
+
+    @Transactional(readOnly = true)
+    public List<HistoricoStatusResponse> listarHistorico(UUID candidaturaId, UUID usuarioId) {
+        // buscarEntidade garante que a candidatura pertence à usuária logada.
+        buscarEntidade(candidaturaId, usuarioId);
+        return historicoStatusRepository.findByCandidaturaIdOrderByAlteradoEmDesc(candidaturaId).stream()
+                .map(h -> new HistoricoStatusResponse(h.getStatusAnterior(), h.getStatusNovo(), h.getAlteradoEm()))
+                .toList();
     }
 
     @Transactional

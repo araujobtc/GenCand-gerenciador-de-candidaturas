@@ -1,94 +1,53 @@
-import { useState, type FormEvent } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
-import { candidaturaService } from '../api/services/candidaturaService'
-import { useEffect } from 'react'
-import { plataformaService, type Plataforma } from '../api/services/workspaceService'
+import { useNavigate } from 'react-router-dom'
 import MainLayout from '../components/layout/MainLayout'
-import styles from './ApplicationPages.module.css'
-import { aplicarMascaraData, converterDataParaISO } from '../utils/date'
+import CandidaturaForm from '../components/candidatura/CandidaturaForm'
+import { Banner } from '../components/ui/Feedback'
+import { candidaturaService } from '../api/services/candidaturaService'
+import { useWorkspace } from '../hooks/useWorkspace'
+import styles from './NovaCandidaturaPage.module.css'
+import ui from '../components/ui/ui.module.css'
 
 function dataLocalHoje() {
-  const hoje = new Date()
-  const ano = hoje.getFullYear()
-  const mes = String(hoje.getMonth() + 1).padStart(2, '0')
-  const dia = String(hoje.getDate()).padStart(2, '0')
+  const [ano, mes, dia] = new Date().toLocaleDateString('en-CA', { timeZone: 'America/Sao_Paulo' }).split('-')
   return `${dia}/${mes}/${ano}`
 }
 
-function NovaCandidaturaPage() {
-  const navigate = useNavigate()
-  const [titulo, setTitulo] = useState('')
-  const [empresa, setEmpresa] = useState('')
-  const [link, setLink] = useState('')
-  const [dataCandidatura, setDataCandidatura] = useState(dataLocalHoje)
-  const [observacao, setObservacao] = useState('')
-  const [plataformas, setPlataformas] = useState<Plataforma[]>([])
-  const [plataformaId, setPlataformaId] = useState('')
-  useEffect(() => { plataformaService.listar().then(setPlataformas).catch(() => setPlataformas([])) }, [])
-  const [erro, setErro] = useState('')
-  const [carregando, setCarregando] = useState(false)
+const passos = [
+  { titulo: 'Cole o link', texto: 'Se o site for conhecido, a plataforma é preenchida sozinha.' },
+  { titulo: 'Salve', texto: 'A candidatura nasce sem status e com a data de hoje.' },
+  { titulo: 'Confirme', texto: 'Responda se já se candidatou. Você também pode deixar para depois.' },
+]
 
-  async function enviar(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault()
-    setErro('')
-    setCarregando(true)
-    try {
-      await candidaturaService.criar({
-        titulo,
-        empresa,
-        link: link || null,
-        dataCandidatura: converterDataParaISO(dataCandidatura),
-        observacao: observacao || null,
-        plataformaId: plataformaId || null,
-      })
-      navigate('/candidaturas')
-    } catch (error) {
-      setErro(error instanceof Error ? error.message : 'Não foi possível salvar a candidatura.')
-    } finally {
-      setCarregando(false)
-    }
-  }
+export default function NovaCandidaturaPage() {
+  const navigate = useNavigate()
+  const { recarregarAlertas } = useWorkspace()
 
   return (
-    <MainLayout title="Nova candidatura">
-      <p className={styles.intro}>Cole o link da vaga e preencha o resto.</p>
-      <form onSubmit={enviar}>
-        <div className={styles.formGrid}>
-          <div className={`${styles.formField} ${styles.wide}`}>
-            <label htmlFor="link">Link da vaga</label>
-            <input id="link" type="url" placeholder="https://..." value={link} onChange={event => setLink(event.target.value)} maxLength={2048} />
-            <p className={styles.hint}>Cole o endereço da oportunidade.</p>
-          </div>
-          <div className={styles.formField}>
-            <label htmlFor="titulo">Título da vaga</label>
-            <input id="titulo" value={titulo} onChange={event => setTitulo(event.target.value)} required maxLength={255} />
-          </div>
-          <div className={styles.formField}>
-            <label htmlFor="empresa">Empresa</label>
-            <input id="empresa" value={empresa} onChange={event => setEmpresa(event.target.value)} required maxLength={255} />
-          </div>
-          <div className={styles.formField}>
-            <label htmlFor="plataforma">Plataforma</label>
-            <select id="plataforma" value={plataformaId} onChange={event => setPlataformaId(event.target.value)}><option value="">Não informada</option>{plataformas.filter(p => !p.oculta).map(p => <option key={p.id} value={p.id}>{p.nome}</option>)}</select>
-          </div>
-          <div className={styles.formField}>
-            <label htmlFor="data">Data da candidatura</label>
-            <input id="data" type="text" inputMode="numeric" placeholder="dd/MM/aaaa" value={dataCandidatura} onChange={event => setDataCandidatura(aplicarMascaraData(event.target.value))} maxLength={10} />
-          </div>
-          <div className={`${styles.formField} ${styles.wide}`}>
-            <label htmlFor="observacao">Observações</label>
-            <textarea id="observacao" placeholder="Anote o que for útil: regime de trabalho, requisitos, quem indicou..." value={observacao} onChange={event => setObservacao(event.target.value)} maxLength={5000} />
-          </div>
-        </div>
-
-        {erro && <p role="alert" className={styles.actionMessage}>{erro}</p>}
-        <div className={styles.actions}>
-          <Link className={styles.secondary} to="/candidaturas">Cancelar</Link>
-          <button className={styles.primary} type="submit" disabled={carregando}>{carregando ? 'Salvando...' : 'Salvar candidatura'}</button>
-        </div>
-      </form>
+    <MainLayout title="Nova candidatura" backTo="/candidaturas">
+      <p className={ui.intro}>Cole o link da vaga e preencha o resto.</p>
+      <div className={styles.layout}>
+        <section className={ui.card}>
+          <CandidaturaForm
+            valoresIniciais={{ titulo: '', empresa: '', link: '', plataformaId: null, dataCandidatura: dataLocalHoje(), observacao: '' }}
+            textoSalvar="Salvar candidatura" textoSalvando="Salvando…" cancelarPara="/candidaturas"
+            aviso={<Banner tom="Info"><b>A candidatura é criada sem status.</b><br />Depois de salvar, vamos perguntar se você já se candidatou.</Banner>}
+            onSubmit={async dados => {
+              const criada = await candidaturaService.criar(dados)
+              recarregarAlertas()
+              // O estado de navegação não sobrevive a recarregar a página: a pergunta aparece uma única vez.
+              navigate(`/candidaturas/${criada.id}`, { state: { perguntarCandidatou: true } })
+            }}
+          />
+        </section>
+        <aside className={`${ui.card} ${styles.how}`} aria-labelledby="como-funciona">
+          <h2 id="como-funciona" className={ui.cardTitle} style={{ fontSize: 18 }}>Como funciona</h2>
+          <ol className={styles.steps}>
+            {passos.map((p, i) => (
+              <li key={p.titulo}><span className={styles.num}>{i + 1}</span><div><b>{p.titulo}</b><p>{p.texto}</p></div></li>
+            ))}
+          </ol>
+        </aside>
+      </div>
     </MainLayout>
   )
 }
-
-export default NovaCandidaturaPage

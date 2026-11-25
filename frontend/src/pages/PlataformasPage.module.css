@@ -1,0 +1,27 @@
+.card { padding: 0; overflow: hidden; }
+.tableWrap { overflow-x: auto; }
+.table { width: 100%; border-collapse: collapse; font-size: 14px; }
+.table th { padding: 12px 20px; background: var(--bg); color: var(--muted); font: 600 11px Inter, Arial, sans-serif; text-transform: uppercase; letter-spacing: .04em; text-align: left; white-space: nowrap; }
+.table td { padding: 14px 20px; border-top: 1px solid var(--border); vertical-align: middle; }
+.name { display: flex; align-items: center; gap: 12px; }
+.name b { display: block; font: 600 14px Poppins, Arial, sans-serif; }
+.name small, .cardTop small { display: block; color: var(--muted); font-size: 12px; margin-top: 2px; }
+.globe { width: 34px; height: 34px; border-radius: 9px; background: var(--blue-soft); color: var(--blue); display: grid; place-items: center; flex: none; }
+.actions { display: flex; justify-content: flex-end; gap: 8px; }
+.dim .name b, .dim td:not(:last-child) { color: var(--muted); }
+.cards { list-style: none; margin: 0; padding: 12px; display: grid; gap: 10px; }
+.cardItem { display: grid; gap: 10px; padding: 14px; border: 1px solid var(--border); border-radius: 12px; }
+.cardTop { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
+.cardTop b { font: 600 15px Poppins, Arial, sans-serif; }
+.cardBottom { display: flex; align-items: center; justify-content: space-between; color: var(--muted); font-size: 13px; }
+.obs { margin: 0; color: var(--muted); font-size: 13px; }
+.options { margin: 0; padding: 0; border: 0; display: grid; gap: 10px; }
+.options legend { padding: 0; margin-bottom: 10px; font-weight: 600; font-size: 14px; }
+.option { display: flex; align-items: flex-start; gap: 12px; padding: 12px 14px; border: 1px solid var(--border); border-radius: 12px; cursor: pointer; }
+.option input { margin-top: 3px; accent-color: var(--blue); }
+.option b { display: block; font-size: 14px; }
+.option small { display: block; margin-top: 2px; color: var(--muted); font-size: 13px; }
+.optionOn { border-color: var(--blue); background: var(--blue-soft); }
+.irreversible { display: flex; align-items: center; gap: 6px; margin: 14px 0 0; color: var(--danger); font-size: 13px; }
+
+.toolbar { display: flex; justify-content: flex-end; margin-bottom: 12px; }
