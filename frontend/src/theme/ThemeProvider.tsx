@@ -30,6 +30,12 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   }, [preference])
 
   const setPreference = useCallback((nova: ThemePreference) => {
+    const raiz = document.documentElement
+    const movimentoReduzido = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    if (!movimentoReduzido) {
+      raiz.classList.add('theme-transition')
+      window.setTimeout(() => raiz.classList.remove('theme-transition'), 250)
+    }
     setPreferenceState(nova)
     try { localStorage.setItem(THEME_STORAGE_KEY, nova) } catch { /* armazenamento indisponível */ }
   }, [])

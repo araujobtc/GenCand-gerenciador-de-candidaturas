@@ -3,10 +3,11 @@
 
 /* ---------- Menu lateral ---------- */
 .sidebar { position: sticky; top: 0; height: 100vh; height: 100dvh; z-index: 30; display: flex; flex-direction: column; padding: 12px 10px; background: var(--card); border-right: 1px solid var(--border); }
-.brand { display: flex; align-items: center; height: 56px; margin: 0 0 12px; padding: 0 2px; text-decoration: none; }
-.brandIcon { width: 40px; height: 40px; }
-.brandFull { display: none; height: 56px; width: auto; max-width: 100%; }
+.brand { display: flex; align-items: center; justify-content: center; min-height: 72px; height: 72px; margin: 0 0 12px; padding: 0 2px; text-decoration: none; }
+.brandIcon { width: 44px; height: 44px; object-fit: contain; flex: none; }
+.brandFull { display: none; width: 100%; height: auto; max-width: 100%; object-fit: contain; }
 .onDark { display: none !important; }
+.expanded .brand { justify-content: flex-start; }
 .expanded .brandIcon { display: none; }
 .expanded .brandFull.onLight { display: block; }
 :root[data-theme='dark'] .expanded .brandFull.onLight { display: none; }

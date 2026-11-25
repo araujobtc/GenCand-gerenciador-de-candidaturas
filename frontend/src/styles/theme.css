@@ -7,29 +7,24 @@
   --muted: #647087;
   --border: #E3E8F0;
   --border-strong: #CFD6E4;
-
   --blue: #3157D5;
   --teal: #159B91;
   --coral: #E87560;
   --purple: #8257C5;
   --amber: #E6A52E;
   --gray: #8A94A8;
-
   --blue-soft: #E9EEFC;
   --teal-soft: #E1F3F1;
   --coral-soft: #FCE9E5;
   --purple-soft: #EFE9F9;
   --amber-soft: #FBF0DA;
   --gray-soft: #EEF0F5;
-
-  /* Texto sobre as superfícies suaves (contraste AA). */
   --blue-ink: #2447B8;
   --teal-ink: #0E6F68;
   --coral-ink: #B23F2B;
   --purple-ink: #5F3A9E;
   --amber-ink: #7A5200;
   --gray-ink: #4B5569;
-
   --danger: #C2412D;
   --danger-soft: #FCE9E5;
   --on-blue: #FFFFFF;
@@ -37,6 +32,8 @@
   --shadow: 0 10px 30px rgba(32, 42, 59, .14);
   --radius: 12px;
   --radius-sm: 10px;
+  --theme-duration: 200ms;
+  --theme-ease: ease;
   color-scheme: light;
 }
 
@@ -48,28 +45,24 @@
   --muted: #AAB5C8;
   --border: #39445A;
   --border-strong: #4A5670;
-
   --blue: #7895FF;
   --teal: #4CC9BD;
   --coral: #FF927E;
   --purple: #B69AF2;
   --amber: #F5C66B;
   --gray: #8F9AB0;
-
   --blue-soft: #2A3A6B;
   --teal-soft: #1F4A4A;
   --coral-soft: #55313A;
   --purple-soft: #3F3466;
   --amber-soft: #55472A;
   --gray-soft: #2F384D;
-
   --blue-ink: #AFC0FF;
   --teal-ink: #8FE3DA;
   --coral-ink: #FFB9AB;
   --purple-ink: #D5C3FA;
   --amber-ink: #F8DA9B;
   --gray-ink: #C4CCDB;
-
   --danger: #FF927E;
   --danger-soft: #55313A;
   --on-blue: #10172A;
@@ -79,6 +72,26 @@
 }
 
 body { background: var(--bg); color: var(--text); }
+
+html.theme-transition,
+html.theme-transition *,
+html.theme-transition *::before,
+html.theme-transition *::after {
+  transition:
+    background-color var(--theme-duration) var(--theme-ease),
+    color var(--theme-duration) var(--theme-ease),
+    border-color var(--theme-duration) var(--theme-ease),
+    fill var(--theme-duration) var(--theme-ease),
+    stroke var(--theme-duration) var(--theme-ease),
+    box-shadow var(--theme-duration) var(--theme-ease) !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html.theme-transition,
+  html.theme-transition *,
+  html.theme-transition *::before,
+  html.theme-transition *::after { transition: none !important; }
+}
 
 .sr-only {
   position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0;
