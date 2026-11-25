@@ -1,8 +1,11 @@
+/* Campos de filtro com a mesma altura e linha de base. */
 .desktopOnly { display: block; }
 .filters { display: grid; grid-template-columns: minmax(220px, 1.4fr) repeat(3, minmax(150px, 1fr)) auto; align-items: end; gap: 16px; margin-bottom: 16px; padding: 18px 20px; }
+.filters > * { min-width: 0; }
+.filters input, .filters select { box-sizing: border-box; height: 40px; min-height: 40px; }
 .search { min-width: 0; }
+.filters .lupaBtn { box-sizing: border-box; width: 40px; height: 40px; min-height: 40px; align-self: end; padding: 0; }
 .notice { margin-bottom: 12px; }
-
 .listCard { padding: 0; overflow: hidden; }
 .listHead { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; padding: 20px 20px 14px; }
 .semStatusPill { cursor: pointer; background: var(--gray-soft); font-family: inherit; }
@@ -19,12 +22,9 @@
 .update { display: grid; gap: 2px; }
 .warn { display: inline-flex; align-items: center; gap: 4px; color: var(--amber-ink); font-size: 12px; font-weight: 500; }
 .actions { display: flex; justify-content: flex-end; gap: 8px; }
-
 .pager { display: flex; align-items: center; gap: 16px; padding: 14px 20px; border-top: 1px solid var(--border); color: var(--muted); font-size: 13px; }
 .pagerInfo { flex: 1; }
 .pagerBtns { display: flex; gap: 8px; }
-
-/* Celular */
 .mobileBar { display: flex; gap: 10px; margin-bottom: 12px; }
 .mobileBar .search { flex: 1; }
 .filterBtn { position: relative; width: 40px; height: 40px; flex: none; border-radius: 10px; color: var(--text); }
@@ -38,7 +38,6 @@
 .cardMeta .update { text-align: right; }
 .fab { position: fixed; right: 16px; bottom: calc(76px + env(safe-area-inset-bottom, 0px)); z-index: 35; display: inline-flex; align-items: center; gap: 8px; min-height: 48px; padding: 0 20px; border-radius: 999px; background: var(--blue); color: var(--on-blue); font: 600 14px Poppins, Arial, sans-serif; text-decoration: none; box-shadow: var(--shadow); }
 .sheet { display: grid; gap: 16px; }
-
 @media (max-width: 1100px) {
   .filters { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   .filters .search { grid-column: 1 / -1; }

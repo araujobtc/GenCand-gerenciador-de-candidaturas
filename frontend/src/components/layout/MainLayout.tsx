@@ -18,9 +18,7 @@ const itens: { to: string; label: string; icon: IconName }[] = [
 
 interface MainLayoutProps {
   title: string
-  /** Ação principal contextual, mostrada no cabeçalho (só no computador). */
   actions?: ReactNode
-  /** No celular, mostra a seta de voltar antes do título (telas de detalhe). */
   backTo?: string
   children: ReactNode
 }
@@ -49,20 +47,16 @@ export default function MainLayout({ title, actions, backTo, children }: MainLay
           <img className={`${styles.brandFull} ${styles.onLight}`} src="/logo-gencand.svg" alt="" />
           <img className={`${styles.brandFull} ${styles.onDark}`} src="/logo-gencand-branco.svg" alt="" />
         </Link>
-
         <nav className={styles.nav} aria-label="Navegação principal">
           {itens.map(item => (
             <NavLink key={item.to} to={item.to} className={({ isActive }) => `${styles.navItem} ${isActive ? styles.active : ''}`} data-tooltip={item.label}>
-              <Icon name={item.icon} size={20} />
-              <span className={styles.navLabel}>{item.label}</span>
+              <Icon name={item.icon} size={20} /><span className={styles.navLabel}>{item.label}</span>
             </NavLink>
           ))}
         </nav>
-
         <div className={styles.sidebarBottom}>
           <button type="button" className={styles.collapse} onClick={alternarMenu} aria-expanded={expandido} data-tooltip={expandido ? 'Recolher menu' : 'Expandir menu'}>
-            <Icon name={expandido ? 'recolher' : 'expandir'} size={20} />
-            <span className={styles.navLabel}>{expandido ? 'Recolher menu' : 'Expandir menu'}</span>
+            <Icon name={expandido ? 'recolher' : 'expandir'} size={20} /><span className={styles.navLabel}>{expandido ? 'Recolher menu' : 'Expandir menu'}</span>
           </button>
           <Link to="/configuracoes#conta" className={styles.account} data-tooltip="Minha conta">
             <span className={styles.avatar} aria-hidden="true">{iniciais(email)}</span>
@@ -70,25 +64,23 @@ export default function MainLayout({ title, actions, backTo, children }: MainLay
           </Link>
         </div>
       </aside>
-
       <div className={styles.main}>
         <header className={styles.header}>
-          {backTo && <Link to={backTo} className={styles.back} aria-label="Voltar"><Icon name="chevronLeft" size={22} /></Link>}
-          <h1 className={styles.title}>{title}</h1>
-          <div className={styles.headerRight}>
-            {actions && <div className={styles.headerActions}>{actions}</div>}
-            <NotificationsBell />
-            <ProfileMenu email={email} />
+          <div className={styles.headerInner}>
+            {backTo && <Link to={backTo} className={styles.back} aria-label="Voltar"><Icon name="chevronLeft" size={22} /></Link>}
+            <h1 className={styles.title}>{title}</h1>
+            <div className={styles.headerRight}>
+              {actions && <div className={styles.headerActions}>{actions}</div>}
+              <NotificationsBell /><ProfileMenu email={email} />
+            </div>
           </div>
         </header>
-        <main className={styles.content} id="conteudo">{children}</main>
+        <main className={styles.content} id="conteudo"><div className={styles.contentInner}>{children}</div></main>
       </div>
-
       <nav className={styles.bottomNav} aria-label="Navegação principal (celular)">
         {itens.map(item => (
           <NavLink key={item.to} to={item.to} className={({ isActive }) => `${styles.bottomItem} ${isActive ? styles.bottomActive : ''}`}>
-            <Icon name={item.icon} size={22} />
-            <span>{item.label}</span>
+            <Icon name={item.icon} size={22} /><span>{item.label}</span>
           </NavLink>
         ))}
       </nav>

@@ -1,7 +1,5 @@
 .shell { --sidebar-w: 64px; min-height: 100vh; min-height: 100dvh; display: grid; grid-template-columns: var(--sidebar-w) minmax(0, 1fr); background: var(--bg); color: var(--text); font-family: Inter, Arial, sans-serif; }
 .expanded { --sidebar-w: 240px; }
-
-/* ---------- Menu lateral ---------- */
 .sidebar { position: sticky; top: 0; height: 100vh; height: 100dvh; z-index: 30; display: flex; flex-direction: column; padding: 12px 10px; background: var(--card); border-right: 1px solid var(--border); }
 .brand { display: flex; align-items: center; justify-content: center; min-height: 72px; height: 72px; margin: 0 0 12px; padding: 0 2px; text-decoration: none; }
 .brandIcon { width: 44px; height: 44px; object-fit: contain; flex: none; }
@@ -12,7 +10,6 @@
 .expanded .brandFull.onLight { display: block; }
 :root[data-theme='dark'] .expanded .brandFull.onLight { display: none; }
 :root[data-theme='dark'] .expanded .brandFull.onDark { display: block !important; }
-
 .nav { display: grid; gap: 4px; }
 .navItem, .collapse, .account { position: relative; display: flex; align-items: center; gap: 14px; min-height: 44px; padding: 0 12px; border-radius: 10px; color: var(--muted); text-decoration: none; font: 500 14px Inter, Arial, sans-serif; border: 0; background: none; cursor: pointer; width: 100%; text-align: left; }
 .navItem:hover, .collapse:hover, .account:hover { background: var(--gray-soft); color: var(--text); }
@@ -20,35 +17,30 @@
 .active:hover { background: var(--blue-soft); color: var(--blue); }
 .navLabel, .accountText { display: none; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .expanded .navLabel, .expanded .accountText { display: block; }
-
 .sidebarBottom { margin-top: auto; padding-top: 12px; border-top: 1px solid var(--border); display: grid; gap: 4px; }
 .account { padding: 6px 8px; }
 .avatar { width: 32px; height: 32px; flex: none; border-radius: 50%; background: var(--blue-soft); color: var(--blue); display: grid; place-items: center; font: 700 12px Inter, Arial, sans-serif; }
 .accountText b { display: block; font-size: 13px; color: var(--text); }
 .accountText small { display: block; font-size: 11px; color: var(--muted); }
-
-/* Tooltips dos itens quando o menu está recolhido */
 .shell:not(.expanded) [data-tooltip]:hover::after,
 .shell:not(.expanded) [data-tooltip]:focus-visible::after {
   content: attr(data-tooltip); position: absolute; left: calc(100% + 10px); top: 50%; transform: translateY(-50%); z-index: 60;
   padding: 6px 10px; border-radius: 8px; background: var(--text); color: var(--bg); font: 500 12px Inter, Arial, sans-serif; white-space: nowrap; pointer-events: none;
 }
-
-/* ---------- Cabeçalho e conteúdo ---------- */
 .main { min-width: 0; display: flex; flex-direction: column; }
-.header { position: sticky; top: 0; z-index: 20; height: 64px; display: flex; align-items: center; gap: 12px; padding: 0 32px; background: var(--card); border-bottom: 1px solid var(--border); }
+.header { position: sticky; top: 0; z-index: 20; min-height: 64px; display: flex; align-items: center; padding: 0 32px; background: var(--card); border-bottom: 1px solid var(--border); }
+.headerInner { display: flex; align-items: center; gap: 12px; width: 100%; max-width: 1200px; margin-inline: auto; min-width: 0; }
 .title { flex: 1; min-width: 0; margin: 0; font: 600 22px Poppins, Arial, sans-serif; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .headerRight { display: flex; align-items: center; gap: 12px; }
 .headerActions { display: flex; align-items: center; gap: 12px; }
 .back { display: none; width: 36px; height: 36px; margin-left: -8px; border-radius: 10px; color: var(--text); place-items: center; text-decoration: none; }
 .content { flex: 1; min-width: 0; padding: 28px 32px 48px; }
-
+.contentInner { width: 100%; max-width: 1200px; margin-inline: auto; min-width: 0; }
 .bottomNav { display: none; }
-
 @media (max-width: 800px) {
   .shell { grid-template-columns: minmax(0, 1fr); }
   .sidebar { display: none; }
-  .header { height: 56px; padding: 0 16px; }
+  .header { min-height: 56px; padding: 0 16px; }
   .title { font-size: 18px; }
   .back { display: inline-grid; }
   .headerActions { display: none; }
