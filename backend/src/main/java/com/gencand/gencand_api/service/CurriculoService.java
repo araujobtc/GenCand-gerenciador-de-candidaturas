@@ -17,7 +17,6 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class CurriculoService {
-    private static final long TAMANHO_MAXIMO = 5L * 1024 * 1024;
     private final CurriculoRepository repository;
     private final UsuarioService usuarioService;
 
@@ -29,13 +28,11 @@ public class CurriculoService {
     @Transactional
     public CurriculoResponse criar(String nome, boolean principal, MultipartFile arquivo, UUID usuarioId) {
         if (arquivo == null || arquivo.isEmpty()) throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Selecione um arquivo PDF.");
-        if (arquivo.getSize() > TAMANHO_MAXIMO) throw new ResponseStatusException(HttpStatus.PAYLOAD_TOO_LARGE, "O PDF deve ter no máximo 5 MB.");
         try {
             byte[] bytes = arquivo.getBytes();
             if (bytes.length < 5 || bytes[0] != '%' || bytes[1] != 'P' || bytes[2] != 'D' || bytes[3] != 'F' || bytes[4] != '-') {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "O arquivo enviado não é um PDF válido.");
             }
-            if (repository.countByUsuarioId(usuarioId) >= 10) throw new ResponseStatusException(HttpStatus.CONFLICT, "Limite de 10 currículos por conta atingido.");
             Usuario usuario = usuarioService.buscarPorId(usuarioId);
             Curriculo c = new Curriculo();
             c.setUsuario(usuario);
