@@ -1,6 +1,19 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;650;700&family=Poppins:wght@600;700&display=swap');
 
 .page {
+  color-scheme: light;
+  --bg: #F6F7FB;
+  --card: #FFFFFF;
+  --elevated: #FFFFFF;
+  --text: #202A3B;
+  --muted: #647087;
+  --border: #E3E8F0;
+  --border-strong: #CFD6E4;
+  --blue: #3157D5;
+  --teal: #159B91;
+  --blue-soft: #E9EEFC;
+  --teal-soft: #E1F3F1;
+  --danger: #C2412D;
   min-height: 100vh;
   min-height: 100dvh;
   box-sizing: border-box;
@@ -11,8 +24,8 @@
   position: relative;
   overflow: hidden;
   padding: 48px 24px 86px;
-  background: #F7F9FD;
-  color: #172B4D;
+  background: var(--bg);
+  color: var(--text);
   font-family: Inter, Arial, sans-serif;
 }
 .page::before, .page::after {
@@ -22,8 +35,8 @@
   pointer-events: none;
   z-index: 0;
 }
-.page::before { width: 460px; height: 460px; right: -40px; top: -115px; background: #EAF0FF; opacity: .52; }
-.page::after { width: 420px; height: 420px; left: -80px; bottom: -230px; background: #E8FAF9; opacity: .55; }
+.page::before { width: 460px; height: 460px; right: -40px; top: -115px; background: var(--blue-soft); opacity: .52; }
+.page::after { width: 420px; height: 420px; left: -80px; bottom: -230px; background: var(--teal-soft); opacity: .55; }
 .card, .cardExpired {
   position: relative;
   z-index: 1;
@@ -33,9 +46,9 @@
   flex-direction: column;
   align-items: center;
   padding: 58px 64px 40px;
-  border: 1px solid #E8EDF5;
+  border: 1px solid var(--border);
   border-radius: 22px;
-  background: #fff;
+  background: var(--card);
   box-shadow: 0 12px 40px rgba(21, 43, 87, .08);
   text-align: center;
 }
@@ -54,10 +67,10 @@
 .failureIcon span { color: white; font-size: 42px; font-weight: 600; line-height: 1; }
 .card h1, .cardExpired h1 {
   margin: 0 0 26px;
-  color: #172B4D;
+  color: var(--text);
   font: 700 29px/1.25 Poppins, Inter, Arial, sans-serif;
 }
-.description { margin: 0; color: #63738E; font-size: 16px; line-height: 27px; }
+.description { margin: 0; color: var(--muted); font-size: 16px; line-height: 27px; }
 .primary {
   min-height: 58px;
   width: min(390px, 100%);
@@ -78,29 +91,29 @@
 }
 .primary:hover { filter: brightness(.97); }
 .primary:focus-visible, .loginLink:focus-visible, .resendForm input:focus-visible {
-  outline: 3px solid #3157D5;
+  outline: 3px solid var(--blue);
   outline-offset: 3px;
 }
 .primary:disabled { opacity: .65; cursor: wait; }
-.helper { margin: 35px 0 0; color: #8A98AE; font-size: 13px; line-height: 20px; }
+.helper { margin: 35px 0 0; color: var(--muted); font-size: 13px; line-height: 20px; }
 .cardExpired .iconWrap { height: 118px; }
 .cardExpired h1 { margin-bottom: 26px; font-size: 29px; }
 .resendForm { width: min(390px, 100%); margin-top: 70px; text-align: left; }
-.resendForm label { display: block; margin-bottom: 8px; color: #263653; font-size: 14px; font-weight: 600; }
+.resendForm label { display: block; margin-bottom: 8px; color: var(--text); font-size: 14px; font-weight: 600; }
 .resendForm input {
   width: 100%; height: 56px; box-sizing: border-box; padding: 0 21px;
-  border: 1.4px solid #CFD8E6; border-radius: 9px; background: white;
-  color: #263653; font: 15px Inter, Arial, sans-serif;
+  border: 1.4px solid var(--border-strong); border-radius: 9px; background: white;
+  color: var(--text); font: 15px Inter, Arial, sans-serif;
 }
 .resendForm input::placeholder { color: #9AA6B8; }
 .resendForm .primary { margin-top: 32px; width: 100%; }
-.loginPrompt { margin: 39px 0 12px; color: #63738E; font-size: 14px; }
+.loginPrompt { margin: 39px 0 12px; color: var(--muted); font-size: 14px; }
 .loginLink { color: #1557E8; text-decoration: none; font-size: 14px; font-weight: 650; }
 .feedback, .error { max-width: 390px; margin: 12px 0 0; font-size: 13px; line-height: 19px; }
-.feedback { color: #3157D5; }
-.error { color: #B42318; }
-.page footer { position: absolute; bottom: 65px; z-index: 1; color: #91A0B5; font-size: 13px; text-align: center; }
-.loading { position: relative; z-index: 1; color: #63738E; font-size: 16px; }
+.feedback { color: var(--blue); }
+.error { color: var(--danger); }
+.page footer { position: absolute; bottom: 65px; z-index: 1; color: var(--muted); font-size: 13px; text-align: center; }
+.loading { position: relative; z-index: 1; color: var(--muted); font-size: 16px; }
 @media (max-width: 640px) {
   .page { padding: 24px 16px 76px; }
   .card, .cardExpired { padding: 42px 24px 32px; min-height: 0; }

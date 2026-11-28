@@ -1,11 +1,24 @@
 .page {
+  color-scheme: light;
+  --bg: #F6F7FB;
+  --card: #FFFFFF;
+  --elevated: #FFFFFF;
+  --text: #202A3B;
+  --muted: #647087;
+  --border: #E3E8F0;
+  --border-strong: #CFD6E4;
+  --blue: #3157D5;
+  --teal: #159B91;
+  --blue-soft: #E9EEFC;
+  --teal-soft: #E1F3F1;
+  --danger: #C2412D;
   width: 100%;
   min-height: 100vh;
   min-height: 100dvh;
   display: grid;
   grid-template-columns: 640px minmax(0, 1fr);
-  background: #F6F7FB;
-  color: #202A3B;
+  background: var(--bg);
+  color: var(--text);
   font-family: Inter, Arial, sans-serif;
   overflow: hidden;
 }
@@ -28,7 +41,7 @@
   content: "";
   position: absolute;
   border-radius: 50%;
-  background: #fff;
+  background: var(--card);
   pointer-events: none;
 }
 
@@ -131,8 +144,8 @@
   max-width: 100%;
   box-sizing: border-box;
   padding: 40px;
-  background: #fff;
-  border: 1px solid #E3E8F0;
+  background: var(--card);
+  border: 1px solid var(--border);
   border-radius: 20px;
 }
 
@@ -142,13 +155,13 @@
   font-size: 28px;
   line-height: 34px;
   font-weight: 700;
-  color: #202A3B;
+  color: var(--text);
   margin: 0 0 4px;
 }
 
 .subtitle {
   margin: 0 0 28px;
-  color: #647087;
+  color: var(--muted);
   font-size: 14px;
   line-height: 21px;
 }
@@ -156,7 +169,7 @@
 .field {
   display: block;
   margin: 0 0 25px;
-  color: #202A3B;
+  color: var(--text);
   font-size: 14px;
   line-height: 18px;
 }
@@ -171,24 +184,24 @@
   width: 100%;
   height: 45px;
   box-sizing: border-box;
-  border: 1px solid #CFD6E4;
+  border: 1px solid var(--border-strong);
   border-radius: 10px;
-  background: #fff;
+  background: var(--card);
   padding: 0 14px;
-  color: #202A3B;
+  color: var(--text);
   font: 14px Inter, Arial, sans-serif;
 }
 
 .field input:focus-visible,
 .field textarea:focus-visible {
-  outline: 3px solid #3157D5;
+  outline: 3px solid var(--blue);
   outline-offset: 2px;
-  border-color: #3157D5;
+  border-color: var(--blue);
 }
 
 .field input::placeholder,
 .field textarea::placeholder {
-  color: #647087;
+  color: var(--muted);
   opacity: 1;
 }
 
@@ -210,7 +223,7 @@
 .primary:focus-visible,
 .textLink:focus-visible,
 .linkLine a:focus-visible {
-  outline: 3px solid #3157D5;
+  outline: 3px solid var(--blue);
   outline-offset: 3px;
 }
 
@@ -222,28 +235,28 @@
 .linkLine {
   margin: 29px 0 0;
   padding-top: 17px;
-  border-top: 1px solid #E3E8F0;
+  border-top: 1px solid var(--border);
   text-align: center;
-  color: #647087;
+  color: var(--muted);
   font-size: 14px;
 }
 
 .linkLine a,
 .textLink {
-  color: #3157D5;
+  color: var(--blue);
   text-decoration: none;
   font-weight: 600;
 }
 
 .message {
   margin: 12px 0;
-  color: #3157D5;
+  color: var(--blue);
   font-size: 13px;
 }
 
 .error {
   margin: 12px 0;
-  color: #B42318;
+  color: var(--danger);
   font-size: 13px;
 }
 
@@ -288,4 +301,4 @@
 
 
 .authLinks { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; margin: 0 0 20px; text-align: right; }
-.fieldHint { margin: 0 0 20px; color: #647087; font-size: 12px; }
+.fieldHint { margin: 0 0 20px; color: var(--muted); font-size: 12px; }
